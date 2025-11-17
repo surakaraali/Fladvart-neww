@@ -5,16 +5,15 @@ export default function Footer() {
   return (
     <div className="min-h-screen bg-white">
       {/* Footer Section */}
-      <footer className="bg-gray-900 text-white px-12 py-16">
-        <div className="max-w-7xl mx-auto">
+      <footer className="bg-[#121727] text-white px-12 py-16">
+        <div className="bg-[#121727] max-w-7xl mx-auto">
           <div className="grid grid-cols-12 gap-16">
             {/* Left Column - Contact Form */}
             <div className="col-span-5">
               {/* Logo */}
               <div className="mb-16">
                 <h2 className="text-4xl font-bold">
-                  FLADV<span className="font-light">ART</span>
-                  <span className="text-2xl align-top">®</span>
+                  <img src="/logofladvart.png" alt="logo" className="w-52 h-auto" />
                 </h2>
               </div>
 
@@ -56,7 +55,7 @@ export default function Footer() {
                   <label className="block text-sm mb-2">Message</label>
                   <textarea
                     placeholder="Write your message.."
-                    rows={3}
+                    rows={1}
                     className="w-full bg-transparent border-b border-gray-600 py-2 focus:outline-none focus:border-white transition resize-none"
                   ></textarea>
                 </div>
@@ -84,7 +83,7 @@ export default function Footer() {
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  className="bg-white text-gray-900 px-8 py-3 font-semibold hover:bg-gray-200 transition mt-8"
+                  className="bg-white text-gray-900 px-8 py-3 rounded-sm font-semibold hover:bg-gray-200 transition mt-8"
                 >
                   Request an Offer
                 </button>
@@ -92,7 +91,7 @@ export default function Footer() {
             </div>
 
             {/* Right Column - Info & Links */}
-            <div className="col-span-7 pl-16">
+            <div className="col-span-7 pl-16 mt-56">
               <div className="grid grid-cols-2 gap-16 mb-16">
                 {/* Address */}
                 <div>
@@ -136,7 +135,7 @@ export default function Footer() {
               </div>
 
               {/* Copyright */}
-              <div className="flex justify-between items-center pt-8 border-t border-gray-800">
+              <div className="flex mt-64 justify-between items-center pt-8 border-gray-800">
                 <p className="text-gray-500 text-sm">Fladvart® All Rights Reserved.</p>
                 <p className="text-gray-500 text-sm">© 2025</p>
               </div>
