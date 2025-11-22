@@ -1,4 +1,7 @@
+import { useLanguage } from '../LanguageProvider';
+
 export default function HeroSection() {
+  const { locale, setLocale, t } = useLanguage();
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -14,20 +17,31 @@ export default function HeroSection() {
           Your browser does not support the video tag.
         </video>
 
-        {/* Navigation */}
-        <nav className="absolute top-8 text-center z-10">
-          <div className="flex flex-col gap-2 text-white text-xs font-light">
-            <a href="#why" className="hover:opacity-70 transition">
-              WHY WE EXIST
-            </a>
-            <a href="#services" className="hover:opacity-70 transition">
-              SERVICES
-            </a>
-            <a href="#contact" className="hover:opacity-70 transition">
-              CONTACT US
-            </a>
+        {/* Navigation - Center */}
+        <nav className="absolute top-8 left-1/2 transform -translate-x-1/2 z-10">
+          <div className="flex flex-col gap-2 text-white text-xs font-light text-center">
+            <a href="#why" className="hover:opacity-70 transition">{t('nav.why')}</a>
+            <a href="#services" className="hover:opacity-70 transition">{t('nav.services')}</a>
+            <a href="#contact" className="hover:opacity-70 transition">{t('nav.contact')}</a>
           </div>
         </nav>
+
+        {/* Language Toggle - Top Right */}
+        <div className="absolute top-8 right-8 z-10 text-white text-xs font-light">
+          <button
+            className={`hover:opacity-70 transition ${locale === 'tr' ? 'font-semibold' : ''}`}
+            onClick={() => setLocale('tr')}
+          >
+            TR
+          </button>
+          <span className="mx-1">|</span>
+          <button
+            className={`hover:opacity-70 transition ${locale === 'en' ? 'font-semibold' : ''}`}
+            onClick={() => setLocale('en')}
+          >
+            EN
+          </button>
+        </div>
 
         {/* Hero Text */}
         {/* <div className="relative z-10 text-center px-8">

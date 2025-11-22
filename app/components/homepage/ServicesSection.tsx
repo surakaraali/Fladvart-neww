@@ -1,7 +1,9 @@
-'use client';
+"use client";
 import { useState } from 'react';
+import { useLanguage } from '../../components/LanguageProvider';
 export default function ServicesSection() {
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const { t } = useLanguage();
 
   const services = [
     { number: '01', title: 'BRAND ARCHITECTURE' },
@@ -77,8 +79,8 @@ export default function ServicesSection() {
 
           <div className="grid grid-cols-12 gap-8">
             {/* Left side - Image */}
-            <div className="col-span-5 -ml-12">
-              <img src="/image5.png" alt="Brand Architecture" className="w-5/6 h-auto aspect-[3/4] object-cover" />
+              <div className="col-span-5 -ml-12">
+              <img src="/image5.png" alt="Brand Architecture" className="w-5/6 h-auto aspect-3/4 object-cover" />
             </div>
 
             {/* Right side - Content */}
@@ -126,13 +128,13 @@ export default function ServicesSection() {
                   </div>
                 </div>
 
-                {/* Services List */}
-                <div className="space-y-4 pt-12">
-                  <h4 className="text-2xl font-bold text-gray-600">Brand Strategy</h4>
-                  <h4 className="text-2xl font-bold text-gray-600">Visual Identity</h4>
-                  <h4 className="text-2xl font-bold text-gray-600">Logo Design</h4>
-                  <h4 className="text-2xl font-bold text-gray-600">Rebranding</h4>
-                </div>
+                    {/* Services List */}
+                    <div className="space-y-4 pt-12">
+                      <h4 className="text-2xl font-bold text-gray-600">{t('services.brand')}</h4>
+                      <h4 className="text-2xl font-bold text-gray-600">{t('services.visual')}</h4>
+                      <h4 className="text-2xl font-bold text-gray-600">{t('services.logo')}</h4>
+                      <h4 className="text-2xl font-bold text-gray-600">{t('services.rebrand')}</h4>
+                    </div>
               </div>
             </div>
           </div>
@@ -151,7 +153,7 @@ export default function ServicesSection() {
           <div className="grid grid-cols-12 gap-8">
             {/* Left side - Image */}
             <div className="col-span-5">
-              <div className="bg-black aspect-[3/4]"></div>
+              <div className="bg-black aspect-3/4"></div>
             </div>
 
             {/* Right side - Content */}
@@ -208,7 +210,7 @@ export default function ServicesSection() {
           <div className="grid grid-cols-12 gap-8">
             {/* Left side - Image */}
             <div className="col-span-5">
-              <div className="bg-black aspect-[3/4]"></div>
+              <div className="bg-black aspect-3/4"></div>
             </div>
 
             {/* Right side - Content */}
@@ -267,7 +269,7 @@ export default function ServicesSection() {
           <div className="grid grid-cols-12 gap-8">
             {/* Left side - Image */}
             <div className="col-span-5">
-              <div className="bg-black aspect-[3/4]"></div>
+              <div className="bg-black aspect-3/4"></div>
             </div>
 
             {/* Right side - Content */}

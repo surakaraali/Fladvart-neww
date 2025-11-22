@@ -1,7 +1,9 @@
 "use client";
 import { Mail, MapPin, Phone } from "lucide-react";
+import { useLanguage } from './LanguageProvider';
 
 export default function Footer() {
+  const { t } = useLanguage();
   return (
     <div className="min-h-screen bg-white">
       {/* Footer Section */}
@@ -18,13 +20,13 @@ export default function Footer() {
               </div>
 
               {/* Form Title */}
-              <h3 className="text-xl font-bold mb-8">LET'S COLLABORATE</h3>
+              <h3 className="text-xl font-bold mb-8">{t('footer.lets')}</h3>
 
               {/* Form */}
               <form className="space-y-6">
                 {/* Name Input */}
                 <div>
-                  <label className="block text-sm mb-2">Name / Surname</label>
+                  <label className="block text-sm mb-2">{t('footer.name')}</label>
                   <input
                     type="text"
                     className="w-full bg-transparent border-b border-gray-600 py-2 focus:outline-none focus:border-white transition"
@@ -33,7 +35,7 @@ export default function Footer() {
 
                 {/* Email Input */}
                 <div>
-                  <label className="block text-sm mb-2">Email</label>
+                  <label className="block text-sm mb-2">{t('footer.email')}</label>
                   <input
                     type="email"
                     className="w-full bg-transparent border-b border-gray-600 py-2 focus:outline-none focus:border-white transition"
@@ -42,19 +44,19 @@ export default function Footer() {
 
                 {/* Company Input */}
                 <div>
-                  <label className="block text-sm mb-2">Company (If Available)</label>
+                  <label className="block text-sm mb-2">{t('footer.company')}</label>
                   <input
                     type="text"
-                    placeholder="Türkoğulları"
+                    placeholder={t('footer.company_placeholder')}
                     className="w-full bg-transparent border-b border-gray-600 py-2 focus:outline-none focus:border-white transition"
                   />
                 </div>
 
                 {/* Message Textarea */}
                 <div>
-                  <label className="block text-sm mb-2">Message</label>
+                  <label className="block text-sm mb-2">{t('footer.message')}</label>
                   <textarea
-                    placeholder="Write your message.."
+                    placeholder={t('footer.message_placeholder')}
                     rows={1}
                     className="w-full bg-transparent border-b border-gray-600 py-2 focus:outline-none focus:border-white transition resize-none"
                   ></textarea>
@@ -62,20 +64,20 @@ export default function Footer() {
 
                 {/* Phone Input */}
                 <div>
-                  <label className="block text-sm mb-2">Phone Number</label>
+                  <label className="block text-sm mb-2">{t('footer.phone')}</label>
                   <input
                     type="tel"
-                    placeholder="+1 012 3456 789"
+                    placeholder={t('footer.phone_placeholder')}
                     className="w-full bg-transparent border-b border-gray-600 py-2 focus:outline-none focus:border-white transition"
                   />
                 </div>
 
                 {/* Service Input */}
                 <div>
-                  <label className="block text-sm mb-2">Service</label>
+                  <label className="block text-sm mb-2">{t('footer.service')}</label>
                   <input
                     type="text"
-                    placeholder="Which service would you like to receive information about?"
+                    placeholder={t('footer.service_placeholder')}
                     className="w-full bg-transparent border-b border-gray-600 py-2 focus:outline-none focus:border-white transition"
                   />
                 </div>
@@ -85,7 +87,7 @@ export default function Footer() {
                   type="submit"
                   className="bg-white text-gray-900 px-8 py-3 rounded-sm font-semibold hover:bg-gray-200 transition mt-8"
                 >
-                  Request an Offer
+                  {t('footer.submit')}
                 </button>
               </form>
             </div>
@@ -105,13 +107,13 @@ export default function Footer() {
 
                 {/* Contact */}
                 <div>
-                  <h4 className="text-sm font-semibold mb-4">CONTACT</h4>
+                  <h4 className="text-sm font-semibold mb-4">{t('footer.contact')}</h4>
                   <div className="space-y-2 text-sm">
                     <p className="text-gray-400">
-                      <span className="text-white">PH</span> +90 538 9953
+                      <span className="text-white">{t('footer.phone_label')}</span> +90 538 9953
                     </p>
                     <p className="text-gray-400">
-                      <span className="text-white">EM</span> info@flad.art
+                      <span className="text-white">{t('footer.email_label')}</span> info@flad.art
                     </p>
                   </div>
                 </div>
@@ -119,9 +121,9 @@ export default function Footer() {
 
               {/* Navigation Links */}
               <div className="flex gap-16 mb-16">
-                <a href="#contact" className="text-sm hover:text-gray-400 transition">CONTACT US</a>
-                <a href="#why" className="text-sm hover:text-gray-400 transition">WHY WE EXIST</a>
-                <a href="#services" className="text-sm hover:text-gray-400 transition">SERVICES</a>
+                <a href="#contact" className="text-sm hover:text-gray-400 transition">{t('footer.contact_us')}</a>
+                <a href="#why" className="text-sm hover:text-gray-400 transition">{t('footer.why_we_exist')}</a>
+                <a href="#services" className="text-sm hover:text-gray-400 transition">{t('footer.services')}</a>
               </div>
 
               {/* Social Icons */}
@@ -136,7 +138,7 @@ export default function Footer() {
 
               {/* Copyright */}
               <div className="flex mt-64 justify-between items-center pt-8 border-gray-800">
-                <p className="text-gray-500 text-sm">Fladvart® All Rights Reserved.</p>
+                <p className="text-gray-500 text-sm">{t('footer.rights')}</p>
                 <p className="text-gray-500 text-sm">© 2025</p>
               </div>
             </div>

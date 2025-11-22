@@ -1,0 +1,28 @@
+{
+  "nav.why": "NEDEN VARIZ",
+  "nav.services": "SERVİSLER",
+  "nav.contact": "İLETİŞİM",
+
+  "footer.lets": "İŞ BİRLİĞİ",
+  "footer.name": "Ad / Soyad",
+  "footer.email": "E-posta",
+  "footer.company": "Şirket (varsa)",
+  "footer.message": "Mesaj",
+  "footer.phone": "Telefon Numarası",
+  "footer.service": "Hizmet",
+  "footer.submit": "Teklif İste",
+  "footer.contact_us": "İLETİŞİM",
+  "footer.why_we_exist": "NEDEN VARIZ",
+  "footer.services": "SERVİSLER",
+  "footer.rights": "Fladvart® Tüm Hakları Saklıdır.",
+  "footer.phone_label": "TEL",
+  "footer.email_label": "EM",
+  "footer.contact": "İLETİŞİM",
+  "footer.company_placeholder": "Türkoğulları",
+  "footer.message_placeholder": "Mesajınızı yazın..",
+  "footer.phone_placeholder": "+90 555 123 45 67",
+  "footer.service_placeholder": "Hangi hizmet hakkında bilgi almak istiyorsunuz?",
+
+  "sections.whyWeExist": "NEDEN VARIZ",
+  "sections.services": "SERVİSLER"
+}

@@ -1,0 +1,28 @@
+{
+  "nav.why": "WHY WE EXIST",
+  "nav.services": "SERVICES",
+  "nav.contact": "CONTACT US",
+
+  "footer.lets": "LET'S COLLABORATE",
+  "footer.name": "Name / Surname",
+  "footer.email": "Email",
+  "footer.company": "Company (If Available)",
+  "footer.message": "Message",
+  "footer.phone": "Phone Number",
+  "footer.service": "Service",
+  "footer.submit": "Request an Offer",
+  "footer.contact_us": "CONTACT US",
+  "footer.why_we_exist": "WHY WE EXIST",
+  "footer.services": "SERVICES",
+  "footer.rights": "Fladvart® All Rights Reserved.",
+  "footer.phone_label": "PH",
+  "footer.email_label": "EM",
+  "footer.contact": "CONTACT",
+  "footer.company_placeholder": "Türkoğulları",
+  "footer.message_placeholder": "Write your message..",
+  "footer.phone_placeholder": "+1 012 3456 789",
+  "footer.service_placeholder": "Which service would you like to receive information about?",
+
+  "sections.whyWeExist": "WHY WE EXIST",
+  "sections.services": "SERVICES"
+}
