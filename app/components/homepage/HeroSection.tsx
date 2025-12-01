@@ -1,4 +1,7 @@
+import { useLanguage } from '../LanguageProvider';
+
 export default function HeroSection() {
+  const { locale, setLocale, t } = useLanguage();
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -21,24 +24,37 @@ export default function HeroSection() {
               href="#why"
               className="transition-colors duration-200 hover:text-white"
             >
-              WHY WE EXIST
+             {t('nav.why')}
             </a>
             <a
               href="#services"
               className="transition-colors duration-200 hover:text-white"
             >
-              SERVICES
+              {t('nav.services')}
             </a>
             <a
               href="#contact"
               className="transition-colors duration-200 hover:text-white"
             >
-              CONTACT US
+              {t('nav.contact')}
             </a>
           </div>
         </nav>
-
-
+        <div className="absolute top-8 right-8 z-10 text-white text-xs font-light">
+          <button
+            className={`hover:opacity-70 transition ${locale === 'tr' ? 'font-semibold' : ''}`}
+            onClick={() => setLocale('tr')}
+          >
+            TR
+          </button>
+          <span className="mx-1">|</span>
+          <button
+            className={`hover:opacity-70 transition ${locale === 'en' ? 'font-semibold' : ''}`}
+            onClick={() => setLocale('en')}
+          >
+            EN
+          </button>
+        </div>
 
         {/* Hero Text */}
         {/* <div className="relative z-10 text-center px-8">

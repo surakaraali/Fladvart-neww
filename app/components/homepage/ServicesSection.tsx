@@ -1,7 +1,13 @@
-'use client';
+"use client";
 import { useState } from 'react';
+import { useLanguage } from '../../components/LanguageProvider';
 export default function ServicesSection() {
+
+    const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const { t } = useLanguage();
+
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
 
   const services = [
     { number: '01', title: 'BRAND ARCHITECTURE' },
@@ -74,6 +80,7 @@ export default function ServicesSection() {
           <h2 id="brand" className="text-7xl font-bold text-white text-center top-0 mb-18 pb-5 mt-25 font-sans">
             BRAND ARCHITECTURE
           </h2>
+
 
           <div className="grid grid-cols-12 gap-1">
             <div className="col-span-5 pl-12 -ml-12">
@@ -150,11 +157,12 @@ export default function ServicesSection() {
 
                 {/* Services List */}
                 <div className="space-y-4 pt-12 ml-67">
-                  <h4 className="text-2xl font-bold text-white">Brand Strategy</h4>
-                  <h4 className="text-2xl font-bold text-white">Visual Identity</h4>
-                  <h4 className="text-2xl font-bold text-white">Logo Design</h4>
-                  <h4 className="text-2xl font-bold text-white">Rebranding</h4>
+                  <h4 className="text-2xl font-bold text-white">{t('services.brand')}</h4>
+                  <h4 className="text-2xl font-bold text-white">{t('services.visual')}</h4>
+                  <h4 className="text-2xl font-bold text-white">{t('services.logo')}</h4>
+                  <h4 className="text-2xl font-bold text-white">{t('services.rebrand')}</h4>
                 </div>
+
               </div>
             </div>
           </div>
@@ -176,6 +184,7 @@ export default function ServicesSection() {
                 alt="Visual Direction "
                 className="w-full h-[630px] object-cover"
               />
+
             </div>
 
 
@@ -276,6 +285,7 @@ export default function ServicesSection() {
                 alt="Campaign & Narrative Design"
                 className="w-full h-[600px] object-cover"
               />
+
             </div>
 
 
@@ -477,6 +487,7 @@ export default function ServicesSection() {
             SERVICES          </a>
           <h2 id="creative" className="text-7xl font-bold text-white text-center top-0 mb-18 pb-5 mt-25 font-sans">
             CREATIVE CONSULTANCY          </h2>
+
 
           <div className="grid grid-cols-12 gap-1">
             <div className="col-span-5 pl-12 -ml-12">

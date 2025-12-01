@@ -2,6 +2,7 @@ import './globals.css'
 import { Oswald } from 'next/font/google'
 // import ConditionalNavbar from './components/ConditionalNavbar'
 import AuthProvider from './components/AuthProvider'
+import { LanguageProvider } from './components/LanguageProvider'
 
 // const oswald = Oswald({ subsets: ['latin'], weight: ['400','700'] })
 
@@ -17,8 +18,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       // className={`${oswald.className} bg-[#0C0F1D] text-white`} 
       suppressHydrationWarning={true}>
         <AuthProvider>
-          {/* <ConditionalNavbar /> */}
-          {children}
+          <LanguageProvider>
+            {children}
+          </LanguageProvider>
         </AuthProvider>
       </body>
     </html>
