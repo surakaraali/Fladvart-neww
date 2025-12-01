@@ -15,19 +15,30 @@ export default function HeroSection() {
         </video>
 
         {/* Navigation */}
-        <nav className="absolute top-8 text-center z-10">
-          <div className="flex flex-col gap-2 text-white text-xs font-light">
-            <a href="#why" className="hover:opacity-70 transition">
+        <nav className="absolute top-8 left-1/2 -translate-x-1/2 z-10">
+          <div className="flex flex-col gap-2 text-gray-400 text-xs font-light text-left">
+            <a
+              href="#why"
+              className="transition-colors duration-200 hover:text-white"
+            >
               WHY WE EXIST
             </a>
-            <a href="#services" className="hover:opacity-70 transition">
+            <a
+              href="#services"
+              className="transition-colors duration-200 hover:text-white"
+            >
               SERVICES
             </a>
-            <a href="#contact" className="hover:opacity-70 transition">
+            <a
+              href="#contact"
+              className="transition-colors duration-200 hover:text-white"
+            >
               CONTACT US
             </a>
           </div>
         </nav>
+
+
 
         {/* Hero Text */}
         {/* <div className="relative z-10 text-center px-8">
