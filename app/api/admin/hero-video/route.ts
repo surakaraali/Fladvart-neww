@@ -7,7 +7,7 @@ import { authOptions } from '@/lib/auth';
 export async function GET() {
   try {
     const result = await pool.query(`
-      SELECT hv.*, m.url as video_url, m.filename, m.alt_text_tr, m.alt_text_en
+      SELECT hv.*, m.firebase_url as video_url, m.original_filename, m.file_type
       FROM hero_videos hv
       LEFT JOIN media m ON hv.media_id = m.id
       WHERE hv.is_active = true 

@@ -50,7 +50,7 @@ export default function AdminDashboard() {
   };
 
   return (
-    <AdminLayout activeSection="dashboard">
+    <AdminLayout title="Dashboard">
       <div className="space-y-6 font-sans">
         {/* Welcome Section */}
         <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">

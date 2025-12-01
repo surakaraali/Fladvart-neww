@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import bcrypt from 'bcryptjs';
 import { pool } from '@/lib/db';
 

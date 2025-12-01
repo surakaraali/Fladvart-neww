@@ -24,11 +24,11 @@ export async function GET() {
 
     // Get images for this section
     const imagesResult = await pool.query(`
-      SELECT wi.*, m.url, m.filename, m.alt_text_tr, m.alt_text_en
+      SELECT wi.*, m.firebase_url as url, m.original_filename as filename
       FROM why_images wi
       LEFT JOIN media m ON wi.media_id = m.id
-      WHERE wi.why_section_id = $1
-      ORDER BY wi.order_no ASC
+      WHERE wi.section_id = $1
+      ORDER BY wi.image_position ASC
     `, [section.id]);
 
     return NextResponse.json({
@@ -62,18 +62,21 @@ export async function PUT(request: NextRequest) {
 
     const body = await request.json();
     const {
-      section_title_tr, section_title_en,
-      paragraph1_tr, paragraph1_en,
-      paragraph2_tr, paragraph2_en,
-      paragraph3_tr, paragraph3_en,
-      images // Array of {media_id, caption_tr, caption_en, order_no}
+      main_title_tr, main_title_en,
+      left_title_tr, left_title_en,
+      right_paragraph_1_tr, right_paragraph_1_en,
+      right_paragraph_2_tr, right_paragraph_2_en,
+      bottom_text_tr, bottom_text_en,
+      image_1_media_id,
+      image_2_media_id,
+      image_3_media_id
     } = body;
 
     // Validate required fields
-    if (!section_title_en || !section_title_tr) {
+    if (!main_title_en || !main_title_tr) {
       return NextResponse.json({
         success: false,
-        error: 'Section title in both languages is required'
+        error: 'Main title in both languages is required'
       }, { status: 400 });
     }
 
@@ -89,53 +92,65 @@ export async function PUT(request: NextRequest) {
       sectionId = currentResult.rows[0].id;
       await pool.query(`
         UPDATE why_sections 
-        SET section_title_tr = $1, section_title_en = $2,
-            paragraph1_tr = $3, paragraph1_en = $4,
-            paragraph2_tr = $5, paragraph2_en = $6,
-            paragraph3_tr = $7, paragraph3_en = $8,
+        SET main_title_tr = $1, main_title_en = $2,
+            left_title_tr = $3, left_title_en = $4,
+            right_paragraph_1_tr = $5, right_paragraph_1_en = $6,
+            right_paragraph_2_tr = $7, right_paragraph_2_en = $8,
+            bottom_text_tr = $9, bottom_text_en = $10,
             updated_at = CURRENT_TIMESTAMP
-        WHERE id = $9
+        WHERE id = $11
       `, [
-        section_title_tr, section_title_en,
-        paragraph1_tr, paragraph1_en,
-        paragraph2_tr, paragraph2_en,
-        paragraph3_tr, paragraph3_en,
+        main_title_tr, main_title_en,
+        left_title_tr, left_title_en,
+        right_paragraph_1_tr, right_paragraph_1_en,
+        right_paragraph_2_tr, right_paragraph_2_en,
+        bottom_text_tr, bottom_text_en,
         sectionId
       ]);
     } else {
       // Create new section
       const newSectionResult = await pool.query(`
         INSERT INTO why_sections (
-          section_title_tr, section_title_en,
-          paragraph1_tr, paragraph1_en,
-          paragraph2_tr, paragraph2_en,
-          paragraph3_tr, paragraph3_en
+          main_title_tr, main_title_en,
+          left_title_tr, left_title_en,
+          right_paragraph_1_tr, right_paragraph_1_en,
+          right_paragraph_2_tr, right_paragraph_2_en,
+          bottom_text_tr, bottom_text_en
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
         RETURNING id
       `, [
-        section_title_tr, section_title_en,
-        paragraph1_tr, paragraph1_en,
-        paragraph2_tr, paragraph2_en,
-        paragraph3_tr, paragraph3_en
+        main_title_tr, main_title_en,
+        left_title_tr, left_title_en,
+        right_paragraph_1_tr, right_paragraph_1_en,
+        right_paragraph_2_tr, right_paragraph_2_en,
+        bottom_text_tr, bottom_text_en
       ]);
       sectionId = newSectionResult.rows[0].id;
     }
 
     // Update images if provided
-    if (images && Array.isArray(images)) {
-      // Delete existing images
-      await pool.query('DELETE FROM why_images WHERE why_section_id = $1', [sectionId]);
-      
-      // Insert new images
-      for (const img of images) {
-        if (img.media_id) {
-          await pool.query(`
-            INSERT INTO why_images (why_section_id, media_id, caption_tr, caption_en, order_no)
-            VALUES ($1, $2, $3, $4, $5)
-          `, [sectionId, img.media_id, img.caption_tr, img.caption_en, img.order_no]);
-        }
-      }
+    // Delete existing images first
+    await pool.query('DELETE FROM why_images WHERE section_id = $1', [sectionId]);
+    
+    // Insert new images
+    if (image_1_media_id) {
+      await pool.query(`
+        INSERT INTO why_images (section_id, media_id, image_position)
+        VALUES ($1, $2, $3)
+      `, [sectionId, image_1_media_id, 1]);
+    }
+    if (image_2_media_id) {
+      await pool.query(`
+        INSERT INTO why_images (section_id, media_id, image_position)
+        VALUES ($1, $2, $3)
+      `, [sectionId, image_2_media_id, 2]);
+    }
+    if (image_3_media_id) {
+      await pool.query(`
+        INSERT INTO why_images (section_id, media_id, image_position)
+        VALUES ($1, $2, $3)
+      `, [sectionId, image_3_media_id, 3]);
     }
 
     // Return updated data
@@ -144,11 +159,11 @@ export async function PUT(request: NextRequest) {
     `, [sectionId]);
 
     const updatedImages = await pool.query(`
-      SELECT wi.*, m.url, m.filename, m.alt_text_tr, m.alt_text_en
+      SELECT wi.*, m.firebase_url as url, m.original_filename as filename
       FROM why_images wi
       LEFT JOIN media m ON wi.media_id = m.id
-      WHERE wi.why_section_id = $1
-      ORDER BY wi.order_no ASC
+      WHERE wi.section_id = $1
+      ORDER BY wi.image_position ASC
     `, [sectionId]);
 
     return NextResponse.json({
