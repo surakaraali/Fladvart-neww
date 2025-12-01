@@ -131,7 +131,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { id, is_read, is_processed, resend_requested } = body;
+    const { id, is_read, is_processed } = body;
 
     if (!id) {
       return NextResponse.json({
@@ -144,11 +144,10 @@ export async function PUT(request: NextRequest) {
       UPDATE contact_messages 
       SET is_read = COALESCE($1, is_read),
           is_processed = COALESCE($2, is_processed),
-          resend_requested = COALESCE($3, resend_requested),
-          resent_at = CASE WHEN $3 = true AND resend_requested = false THEN CURRENT_TIMESTAMP ELSE resent_at END
-      WHERE id = $4
+          updated_at = CURRENT_TIMESTAMP
+      WHERE id = $3
       RETURNING *
-    `, [is_read, is_processed, resend_requested, id]);
+    `, [is_read, is_processed, id]);
 
     if (result.rows.length === 0) {
       return NextResponse.json({

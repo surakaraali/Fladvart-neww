@@ -8,138 +8,134 @@ export async function GET() {
   try {
     // Get service collection
     const collectionResult = await pool.query(`
-      SELECT sc.*, m.url as hero_image_url, m.filename, m.alt_text_tr, m.alt_text_en
+      SELECT sc.*, m.firebase_url as main_image_url
       FROM service_collections sc
-      LEFT JOIN media m ON sc.hero_media_id = m.id
-      WHERE sc.slug = 'homepage_services'
+      LEFT JOIN media m ON sc.main_image_media_id = m.id
       LIMIT 1
     `);
 
-    if (collectionResult.rows.length === 0) {
-      return NextResponse.json({
-        success: false,
-        error: 'No service collection found'
-      }, { status: 404 });
-    }
+    const collection = collectionResult.rows[0] || null;
 
-    const collection = collectionResult.rows[0];
-
-    // Get services for this collection
+    // Get all services
     const servicesResult = await pool.query(`
-      SELECT s.*, m.url as service_image_url, m.filename, m.alt_text_tr, m.alt_text_en
+      SELECT 
+        s.id,
+        s.collection_id,
+        s.order_number,
+        s.title_en,
+        s.title_tr,
+        s.slug,
+        s.is_active,
+        sc.middle_title_en,
+        sc.middle_title_tr,
+        sc.paragraph_1_en,
+        sc.paragraph_1_tr,
+        sc.paragraph_2_en,
+        sc.paragraph_2_tr,
+        m.firebase_url as image_url,
+        sc.image_media_id
       FROM services s
-      LEFT JOIN media m ON s.media_id = m.id
-      WHERE s.collection_id = $1 AND s.is_active = true
-      ORDER BY s.order_no ASC
-    `, [collection.id]);
-
-    // Get service contents for each service
-    const services = [];
-    for (const service of servicesResult.rows) {
-      const contentResult = await pool.query(`
-        SELECT sc.*, m.url as extra_image_url, m.filename, m.alt_text_tr, m.alt_text_en
-        FROM service_contents sc
-        LEFT JOIN media m ON sc.extra_media_id = m.id
-        WHERE sc.service_id = $1
-      `, [service.id]);
-
-      services.push({
-        ...service,
-        content: contentResult.rows[0] || null
-      });
-    }
+      LEFT JOIN service_contents sc ON s.id = sc.service_id
+      LEFT JOIN media m ON sc.image_media_id = m.id
+      WHERE s.is_active = true
+      ORDER BY s.order_number ASC
+    `);
 
     return NextResponse.json({
-      success: true,
-      data: {
-        collection,
-        services
-      }
+      collection,
+      services: servicesResult.rows
     });
 
   } catch (error) {
     console.error('Services fetch error:', error);
-    return NextResponse.json({
-      success: false,
-      error: 'Failed to fetch services'
-    }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to fetch services' },
+      { status: 500 }
+    );
   }
 }
 
 // POST - Create new service
 export async function POST(request: NextRequest) {
   try {
-    // Check authentication
     const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
-      return NextResponse.json({
-        success: false,
-        error: 'Unauthorized'
-      }, { status: 401 });
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
-    const { name_tr, name_en, media_id, content_tr, content_en, extra_media_id } = body;
+    const {
+      order_number,
+      title_en,
+      title_tr,
+      slug,
+      image_media_id,
+      middle_title_en,
+      middle_title_tr,
+      paragraph_1_en,
+      paragraph_1_tr,
+      paragraph_2_en,
+      paragraph_2_tr,
+      tags,
+      is_active = true
+    } = body;
 
-    // Validate required fields
-    if (!name_en || !name_tr) {
-      return NextResponse.json({
-        success: false,
-        error: 'Service name in both languages is required'
-      }, { status: 400 });
-    }
-
-    // Get homepage services collection
-    const collectionResult = await pool.query(`
-      SELECT id FROM service_collections WHERE slug = 'homepage_services' LIMIT 1
-    `);
+    // Get or create collection
+    let collectionResult = await pool.query('SELECT id FROM service_collections LIMIT 1');
+    let collectionId;
 
     if (collectionResult.rows.length === 0) {
-      return NextResponse.json({
-        success: false,
-        error: 'Service collection not found'
-      }, { status: 404 });
+      const newCollection = await pool.query(
+        `INSERT INTO service_collections (main_title_en, main_title_tr) 
+         VALUES ('SERVICES', 'HİZMETLER') RETURNING id`
+      );
+      collectionId = newCollection.rows[0].id;
+    } else {
+      collectionId = collectionResult.rows[0].id;
     }
 
-    const collectionId = collectionResult.rows[0].id;
-
-    // Get next order number
-    const orderResult = await pool.query(`
-      SELECT COALESCE(MAX(order_no), 0) + 1 as next_order 
-      FROM services WHERE collection_id = $1
-    `, [collectionId]);
-
-    const nextOrder = orderResult.rows[0].next_order;
-
     // Create service
-    const serviceResult = await pool.query(`
-      INSERT INTO services (collection_id, name_tr, name_en, media_id, order_no)
-      VALUES ($1, $2, $3, $4, $5)
-      RETURNING *
-    `, [collectionId, name_tr, name_en, media_id, nextOrder]);
+    const serviceResult = await pool.query(
+      `INSERT INTO services (collection_id, order_number, title_en, title_tr, slug, is_active)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING *`,
+      [collectionId, order_number, title_en, title_tr, slug, is_active]
+    );
 
     const serviceId = serviceResult.rows[0].id;
 
-    // Create service content if provided
-    if (content_tr || content_en) {
-      await pool.query(`
-        INSERT INTO service_contents (service_id, content_tr, content_en, extra_media_id)
-        VALUES ($1, $2, $3, $4)
-      `, [serviceId, content_tr, content_en, extra_media_id]);
+    // Create service content
+    await pool.query(
+      `INSERT INTO service_contents (
+        service_id, image_media_id, middle_title_en, middle_title_tr,
+        paragraph_1_en, paragraph_1_tr, paragraph_2_en, paragraph_2_tr
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+      [
+        serviceId, image_media_id, middle_title_en, middle_title_tr,
+        paragraph_1_en, paragraph_1_tr, paragraph_2_en, paragraph_2_tr
+      ]
+    );
+
+    // Add tags if provided
+    if (tags && Array.isArray(tags)) {
+      for (const tag of tags) {
+        if (tag.tag_en || tag.tag_tr) {
+          await pool.query(
+            `INSERT INTO service_tags (service_id, tag_en, tag_tr)
+             VALUES ($1, $2, $3)`,
+            [serviceId, tag.tag_en, tag.tag_tr]
+          );
+        }
+      }
     }
 
-    return NextResponse.json({
-      success: true,
-      data: serviceResult.rows[0],
-      message: 'Service created successfully'
-    });
-
+    return NextResponse.json(serviceResult.rows[0]);
   } catch (error) {
     console.error('Service creation error:', error);
-    return NextResponse.json({
-      success: false,
-      error: 'Failed to create service'
-    }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to create service' },
+      { status: 500 }
+    );
   }
 }
 
