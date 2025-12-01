@@ -1,6 +1,6 @@
 import AdminLayout from '../AdminLayout';
 import Link from 'next/link';
-import { Video, Image, FileText, Mail } from 'lucide-react';
+import { Video, Image, FileText, Mail, Sparkles } from 'lucide-react';
 
 export default function ContentEditorPage() {
   const contentSections = [
@@ -29,6 +29,14 @@ export default function ContentEditorPage() {
       stats: { items: 5, lastUpdated: '3 days ago' }
     },
     {
+      title: 'CTA Section',
+      description: 'Edit "Your Vision Deserves" section and marquee text',
+      icon: <Sparkles size={32} />,
+      href: '/admin/content/cta-section',
+      color: 'red',
+      stats: { items: 1, lastUpdated: 'Just now' }
+    },
+    {
       title: 'Contact Info',
       description: 'Update contact information and social links',
       icon: <Mail size={32} />,
@@ -43,6 +51,7 @@ export default function ContentEditorPage() {
       blue: 'bg-blue-50 hover:bg-blue-100 border-blue-200 text-blue-700',
       green: 'bg-green-50 hover:bg-green-100 border-green-200 text-green-700',
       purple: 'bg-purple-50 hover:bg-purple-100 border-purple-200 text-purple-700',
+      red: 'bg-red-50 hover:bg-red-100 border-red-200 text-red-700',
       orange: 'bg-orange-50 hover:bg-orange-100 border-orange-200 text-orange-700'
     };
     return colors[color as keyof typeof colors] || colors.blue;

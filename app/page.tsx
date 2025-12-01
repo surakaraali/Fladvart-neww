@@ -3,6 +3,7 @@ import Footer from "./components/Footer";
 import HeroSection from "./components/homepage/HeroSection";
 import WhyWeExist from "./components/homepage/WhyWeExist";
 import ServicesSection from "./components/homepage/ServicesSection";
+import CTASection from "./components/homepage/CTASection";
 
 export default function Home() {
   return (
@@ -12,6 +13,8 @@ export default function Home() {
       <WhyWeExist />
       
       <ServicesSection />
+
+      <CTASection />
  
       <Footer />
     </div>

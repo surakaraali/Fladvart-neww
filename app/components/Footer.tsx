@@ -1,9 +1,77 @@
 "use client";
+import { useState } from 'react';
 import { Mail, MapPin, Phone } from "lucide-react";
 import { useLanguage } from './LanguageProvider';
 
 export default function Footer() {
   const { t } = useLanguage();
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    company: '',
+    message: '',
+    phone: '',
+    serviceInterest: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<{
+    type: 'success' | 'error' | null;
+    message: string;
+  }>({ type: null, message: '' });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitStatus({ type: null, message: '' });
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setSubmitStatus({
+          type: 'success',
+          message: data.message || 'Thank you for your message! We will get back to you soon.'
+        });
+        // Reset form
+        setFormData({
+          name: '',
+          email: '',
+          company: '',
+          message: '',
+          phone: '',
+          serviceInterest: ''
+        });
+      } else {
+        setSubmitStatus({
+          type: 'error',
+          message: data.error || 'Failed to send message. Please try again.'
+        });
+      }
+    } catch (error) {
+      setSubmitStatus({
+        type: 'error',
+        message: 'Network error. Please check your connection and try again.'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   return (
     <div className="min-h-screen bg-white">
       {/* Footer Section */}
@@ -32,14 +100,34 @@ export default function Footer() {
               {/* Form Title */}
               <h3 className="text-xl font-bold mb-8">{t('footer.lets')}</h3>
 
+              {/* Success/Error Message */}
+              {submitStatus.type && (
+                <div className={`p-4 rounded-lg mb-6 ${
+                  submitStatus.type === 'success' 
+                    ? 'bg-green-600 text-white' 
+                    : 'bg-red-600 text-white'
+                }`}>
+                  {submitStatus.message}
+                </div>
+              )}
+
               {/* Form */}
-              <form className="space-y-6">
+              <form className="space-y-6" onSubmit={handleSubmit}>
                 {/* Name Input */}
                 <div>
                   <label className="block text-sm mb-2">{t('footer.name')}</label>
                   <input
                     type="text"
-                    className="w-full bg-transparent border-b border-gray-600 py-2 focus:outline-none focus:border-white transition"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                    autoComplete="name"
+                    className="w-full bg-transparent border-b border-gray-600 py-2 focus:outline-none focus:border-white transition text-white placeholder-gray-500"
+                    style={{
+                      WebkitBoxShadow: '0 0 0 1000px #121727 inset',
+                      WebkitTextFillColor: 'white',
+                    }}
                   />
                 </div>
 
@@ -48,7 +136,16 @@ export default function Footer() {
                   <label className="block text-sm mb-2">{t('footer.email')}</label>
                   <input
                     type="email"
-                    className="w-full bg-transparent border-b border-gray-600 py-2 focus:outline-none focus:border-white transition"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    autoComplete="email"
+                    className="w-full bg-transparent border-b border-gray-600 py-2 focus:outline-none focus:border-white transition text-white placeholder-gray-500"
+                    style={{
+                      WebkitBoxShadow: '0 0 0 1000px #121727 inset',
+                      WebkitTextFillColor: 'white',
+                    }}
                   />
                 </div>
 
@@ -61,8 +158,16 @@ export default function Footer() {
 
                   <input
                     type="text"
+                    name="company"
+                    value={formData.company}
+                    onChange={handleChange}
                     placeholder={t('footer.company_placeholder')}
-                    className="w-full bg-transparent border-b border-gray-600 py-2 focus:outline-none focus:border-white transition"
+                    autoComplete="organization"
+                    className="w-full bg-transparent border-b border-gray-600 py-2 focus:outline-none focus:border-white transition text-white placeholder-gray-500"
+                    style={{
+                      WebkitBoxShadow: '0 0 0 1000px #121727 inset',
+                      WebkitTextFillColor: 'white',
+                    }}
                   />
                 </div>
 
@@ -70,9 +175,17 @@ export default function Footer() {
                 <div>
                   <label className="block text-sm mb-2">{t('footer.message')}</label>
                   <textarea
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    required
                     placeholder={t('footer.message_placeholder')}
                     rows={1}
-                    className="w-full bg-transparent border-b border-gray-600 py-2 focus:outline-none focus:border-white transition resize-none"
+                    className="w-full bg-transparent border-b border-gray-600 py-2 focus:outline-none focus:border-white transition resize-none text-white placeholder-gray-500"
+                    style={{
+                      WebkitBoxShadow: '0 0 0 1000px #121727 inset',
+                      WebkitTextFillColor: 'white',
+                    }}
                   ></textarea>
                 </div>
 
@@ -81,8 +194,16 @@ export default function Footer() {
                   <label className="block text-sm mb-2">{t('footer.phone')}</label>
                   <input
                     type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
                     placeholder={t('footer.phone_placeholder')}
-                    className="w-full bg-transparent border-b border-gray-600 py-2 focus:outline-none focus:border-white transition"
+                    autoComplete="tel"
+                    className="w-full bg-transparent border-b border-gray-600 py-2 focus:outline-none focus:border-white transition text-white placeholder-gray-500"
+                    style={{
+                      WebkitBoxShadow: '0 0 0 1000px #121727 inset',
+                      WebkitTextFillColor: 'white',
+                    }}
                   />
                 </div>
 
@@ -91,17 +212,29 @@ export default function Footer() {
                   <label className="block text-sm mb-2">{t('footer.service')}</label>
                   <input
                     type="text"
+                    name="serviceInterest"
+                    value={formData.serviceInterest}
+                    onChange={handleChange}
                     placeholder={t('footer.service_placeholder')}
-                    className="w-full bg-transparent border-b border-gray-600 py-2 focus:outline-none focus:border-white transition"
+                    className="w-full bg-transparent border-b border-gray-600 py-2 focus:outline-none focus:border-white transition text-white placeholder-gray-500"
+                    style={{
+                      WebkitBoxShadow: '0 0 0 1000px #121727 inset',
+                      WebkitTextFillColor: 'white',
+                    }}
                   />
                 </div>
 
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  className="bg-white text-gray-900 px-8 py-3 rounded-sm font-semibold hover:bg-gray-200 transition mt-4 mb-3"
+                  disabled={isSubmitting}
+                  className={`bg-white text-gray-900 px-8 py-3 rounded-sm font-semibold transition mt-4 mb-3 ${
+                    isSubmitting 
+                      ? 'opacity-50 cursor-not-allowed' 
+                      : 'hover:bg-gray-200'
+                  }`}
                 >
-                  {t('footer.submit')}
+                  {isSubmitting ? t('footer.submitting') || 'Sending...' : t('footer.submit')}
                 </button>
               </form>
             </div>
@@ -181,13 +314,6 @@ export default function Footer() {
               {/* Copyright */}
               <div className="flex mt-64 justify-between items-center pt-8 border-gray-800">
                 <p className="text-gray-500 text-sm">{t('footer.rights')}</p>
-
-              {/* Copyright – alt boşluk küçültüldü */}
-              <div className="flex mt-45 justify-between items-center pt-8 border-gray-800 ">
-                <p className="text-gray-500 text-sm">
-                  {t('footer.rights')}
-                </p>
-
                 <p className="text-gray-500 text-sm">© 2025</p>
               </div>
             </div>
