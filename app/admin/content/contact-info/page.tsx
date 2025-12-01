@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Save, Loader2, MapPin, Phone, Mail, Linkedin, Instagram } from 'lucide-react';
+import { Save, Loader2, MapPin, Phone, Mail, Linkedin, Instagram, Lock, Unlock } from 'lucide-react';
 import AdminLayout from '@/app/admin/AdminLayout';
 
 interface ContactInfo {
@@ -26,6 +26,7 @@ export default function ContactInfoPage() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     fetchContactInfo();
@@ -61,12 +62,18 @@ export default function ContactInfoPage() {
 
       alert('İletişim bilgileri başarıyla kaydedildi!');
       fetchContactInfo();
+      setIsEditing(false);
     } catch (error) {
       console.error('Save error:', error);
       alert('Kaydetme sırasında bir hata oluştu');
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    fetchContactInfo(); // Revert changes
   };
 
   if (loading) {
@@ -82,8 +89,35 @@ export default function ContactInfoPage() {
   return (
     <AdminLayout title="Contact Information">
       <div className="max-w-4xl mx-auto space-y-6">
+        
+        {/* Header with Edit Toggle */}
+        <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-gray-600">
+            Manage your contact details displayed on the website.
+          </p>
+          <div>
+            {!isEditing ? (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <Unlock size={18} className="mr-2" />
+                Enable Editing
+              </button>
+            ) : (
+              <button
+                onClick={handleCancel}
+                className="flex items-center px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+              >
+                <Lock size={18} className="mr-2" />
+                Cancel Editing
+              </button>
+            )}
+          </div>
+        </div>
+
         {/* Address */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className={`bg-white rounded-lg shadow-sm border border-gray-200 p-6 transition-opacity ${!isEditing ? 'opacity-75' : ''}`}>
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
               <MapPin className="w-5 h-5 text-blue-600" />
@@ -99,8 +133,9 @@ export default function ContactInfoPage() {
               <textarea
                 value={contact.address_en}
                 onChange={(e) => setContact({ ...contact, address_en: e.target.value })}
+                disabled={!isEditing}
                 rows={4}
-                className="w-full px-4 py-3 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                 placeholder="NİŞBETİYE, NİŞBETİYE CD NO:24,&#10;34340 BEŞİKTAŞ/İSTANBUL,&#10;TURKEY"
               />
             </div>
@@ -111,8 +146,9 @@ export default function ContactInfoPage() {
               <textarea
                 value={contact.address_tr}
                 onChange={(e) => setContact({ ...contact, address_tr: e.target.value })}
+                disabled={!isEditing}
                 rows={4}
-                className="w-full px-4 py-3 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                 placeholder="NİŞBETİYE, NİŞBETİYE CD NO:24,&#10;34340 BEŞİKTAŞ/İSTANBUL,&#10;TÜRKİYE"
               />
             </div>
@@ -120,7 +156,7 @@ export default function ContactInfoPage() {
         </div>
 
         {/* Phone */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className={`bg-white rounded-lg shadow-sm border border-gray-200 p-6 transition-opacity ${!isEditing ? 'opacity-75' : ''}`}>
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
               <Phone className="w-5 h-5 text-green-600" />
@@ -132,7 +168,8 @@ export default function ContactInfoPage() {
             type="text"
             value={contact.phone}
             onChange={(e) => setContact({ ...contact, phone: e.target.value })}
-            className="w-full px-4 py-3 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            disabled={!isEditing}
+            className="w-full px-4 py-3 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
             placeholder="+90 538 9953"
           />
           <p className="text-xs text-gray-500 mt-2">
@@ -141,7 +178,7 @@ export default function ContactInfoPage() {
         </div>
 
         {/* Email */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className={`bg-white rounded-lg shadow-sm border border-gray-200 p-6 transition-opacity ${!isEditing ? 'opacity-75' : ''}`}>
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
               <Mail className="w-5 h-5 text-purple-600" />
@@ -153,13 +190,14 @@ export default function ContactInfoPage() {
             type="email"
             value={contact.email}
             onChange={(e) => setContact({ ...contact, email: e.target.value })}
-            className="w-full px-4 py-3 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            disabled={!isEditing}
+            className="w-full px-4 py-3 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
             placeholder="info@flad.art"
           />
         </div>
 
         {/* Social Media */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className={`bg-white rounded-lg shadow-sm border border-gray-200 p-6 transition-opacity ${!isEditing ? 'opacity-75' : ''}`}>
           <h2 className="text-lg font-semibold mb-6 text-gray-900">Sosyal Medya</h2>
           
           <div className="space-y-4">
@@ -175,7 +213,8 @@ export default function ContactInfoPage() {
                 type="url"
                 value={contact.linkedin_url}
                 onChange={(e) => setContact({ ...contact, linkedin_url: e.target.value })}
-                className="w-full px-4 py-3 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                disabled={!isEditing}
+                className="w-full px-4 py-3 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                 placeholder="https://www.linkedin.com/company/fladvart"
               />
             </div>
@@ -192,7 +231,8 @@ export default function ContactInfoPage() {
                 type="url"
                 value={contact.instagram_url}
                 onChange={(e) => setContact({ ...contact, instagram_url: e.target.value })}
-                className="w-full px-4 py-3 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                disabled={!isEditing}
+                className="w-full px-4 py-3 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                 placeholder="https://www.instagram.com/fladvart"
               />
             </div>
@@ -252,25 +292,27 @@ export default function ContactInfoPage() {
         </div>
 
         {/* Save Button */}
-        <div className="flex justify-end pb-8">
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {saving ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" />
-                Kaydediliyor...
-              </>
-            ) : (
-              <>
-                <Save className="w-5 h-5" />
-                Değişiklikleri Kaydet
-              </>
-            )}
-          </button>
-        </div>
+        {isEditing && (
+          <div className="flex justify-end pb-8">
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {saving ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Kaydediliyor...
+                </>
+              ) : (
+                <>
+                  <Save className="w-5 h-5" />
+                  Değişiklikleri Kaydet
+                </>
+              )}
+            </button>
+          </div>
+        )}
       </div>
     </AdminLayout>
   );

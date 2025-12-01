@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import AdminLayout from '../../AdminLayout';
-import { Upload, Video, X, Save, Eye, Loader2 } from 'lucide-react';
+import { Upload, Video, X, Save, Eye, Loader2, Lock, Unlock } from 'lucide-react';
 
 export default function HeroVideoPage() {
   const [loading, setLoading] = useState(false);
@@ -18,6 +18,7 @@ export default function HeroVideoPage() {
   });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string>('');
+  const [isEditing, setIsEditing] = useState(false);
 
   // Mevcut hero video'yu yükle
   useEffect(() => {
@@ -127,6 +128,7 @@ export default function HeroVideoPage() {
       if (data.success) {
         alert('Hero video updated successfully!');
         fetchHeroVideo();
+        setIsEditing(false); // Lock after save
       } else {
         alert('Update failed: ' + data.error);
       }
@@ -145,6 +147,13 @@ export default function HeroVideoPage() {
     setFormData(prev => ({ ...prev, media_id: currentVideo?.media_id || null }));
   };
 
+  const handleCancel = () => {
+    setIsEditing(false);
+    fetchHeroVideo(); // Revert changes
+    setSelectedFile(null);
+    setFileError('');
+  };
+
   if (loading && !currentVideo) {
     return (
       <AdminLayout title="Hero Video">
@@ -159,17 +168,38 @@ export default function HeroVideoPage() {
     <AdminLayout title="Hero Video">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
-        <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
-            Hero Section Video
-          </h2>
-          <p className="text-gray-600">
-            Upload and manage the hero section background video
-          </p>
+        <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200 flex justify-between items-center">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              Hero Section Video
+            </h2>
+            <p className="text-gray-600">
+              Upload and manage the hero section background video
+            </p>
+          </div>
+          <div>
+            {!isEditing ? (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <Unlock size={18} className="mr-2" />
+                Enable Editing
+              </button>
+            ) : (
+              <button
+                onClick={handleCancel}
+                className="flex items-center px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+              >
+                <Lock size={18} className="mr-2" />
+                Cancel Editing
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Video Upload Section */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div className={`bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden transition-opacity ${!isEditing ? 'opacity-75 pointer-events-none' : ''}`}>
           <div className="p-6 border-b border-gray-200">
             <h3 className="text-lg font-semibold text-gray-900 flex items-center">
               <Video size={20} className="mr-2" />
@@ -189,7 +219,7 @@ export default function HeroVideoPage() {
                   Your browser does not support the video tag.
                 </video>
                 
-                {selectedFile && (
+                {isEditing && selectedFile && (
                   <button
                     onClick={handleRemovePreview}
                     className="absolute top-4 right-4 p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
@@ -207,26 +237,29 @@ export default function HeroVideoPage() {
             )}
 
             {/* Upload Input */}
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 hover:border-blue-400 transition-colors">
-              <div className="text-center">
-                <Upload size={48} className="mx-auto text-gray-400 mb-4" />
-                <label className="cursor-pointer">
-                  <span className="text-blue-600 hover:text-blue-700 font-medium">
-                    Click to upload
-                  </span>
-                  <span className="text-gray-600"> or drag and drop</span>
-                  <input
-                    type="file"
-                    accept="video/*"
-                    onChange={handleFileSelect}
-                    className="hidden"
-                  />
-                </label>
-                <p className="text-xs text-gray-500 mt-2">
-                  MP4, WebM, MOV or AVI (max. 500MB)
-                </p>
+            {isEditing && (
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 hover:border-blue-400 transition-colors">
+                <div className="text-center">
+                  <Upload size={48} className="mx-auto text-gray-400 mb-4" />
+                  <label className="cursor-pointer">
+                    <span className="text-blue-600 hover:text-blue-700 font-medium">
+                      Click to upload
+                    </span>
+                    <span className="text-gray-600"> or drag and drop</span>
+                    <input
+                      type="file"
+                      accept="video/*"
+                      onChange={handleFileSelect}
+                      className="hidden"
+                      disabled={!isEditing}
+                    />
+                  </label>
+                  <p className="text-xs text-gray-500 mt-2">
+                    MP4, WebM, MOV or AVI (max. 500MB)
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Error Message */}
             {fileError && (
@@ -252,7 +285,7 @@ export default function HeroVideoPage() {
             )}
 
             {/* Upload Button */}
-            {selectedFile && !uploading && (
+            {selectedFile && !uploading && isEditing && (
               <button
                 onClick={handleUploadVideo}
                 className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center"
@@ -272,7 +305,7 @@ export default function HeroVideoPage() {
         </div>
 
         {/* Text Content */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className={`bg-white rounded-lg shadow-sm border border-gray-200 transition-opacity ${!isEditing ? 'opacity-75' : ''}`}>
           <div className="p-6 border-b border-gray-200">
             <h3 className="text-lg font-semibold text-gray-900">
               Video Text Content
@@ -289,8 +322,9 @@ export default function HeroVideoPage() {
                 type="text"
                 value={formData.title_tr}
                 onChange={(e) => setFormData({ ...formData, title_tr: e.target.value })}
+                disabled={!isEditing}
                 placeholder="Markaları süslemek için burada değiliz."
-                className="w-full px-4 py-3 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
               />
             </div>
 
@@ -303,8 +337,9 @@ export default function HeroVideoPage() {
                 type="text"
                 value={formData.title_en}
                 onChange={(e) => setFormData({ ...formData, title_en: e.target.value })}
+                disabled={!isEditing}
                 placeholder="We are not here to decorate brands."
-                className="w-full px-4 py-3 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
               />
             </div>
 
@@ -316,9 +351,10 @@ export default function HeroVideoPage() {
               <textarea
                 value={formData.description_tr}
                 onChange={(e) => setFormData({ ...formData, description_tr: e.target.value })}
+                disabled={!isEditing}
                 placeholder="Kısa açıklama..."
                 rows={3}
-                className="w-full px-4 py-3 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
               />
             </div>
 
@@ -330,9 +366,10 @@ export default function HeroVideoPage() {
               <textarea
                 value={formData.description_en}
                 onChange={(e) => setFormData({ ...formData, description_en: e.target.value })}
+                disabled={!isEditing}
                 placeholder="Short description..."
                 rows={3}
-                className="w-full px-4 py-3 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
               />
             </div>
           </div>
@@ -348,23 +385,25 @@ export default function HeroVideoPage() {
             Preview Site
           </button>
 
-          <button
-            onClick={handleSave}
-            disabled={loading || uploading || !formData.media_id}
-            className="flex items-center px-8 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-          >
-            {loading ? (
-              <>
-                <Loader2 size={20} className="mr-2 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save size={20} className="mr-2" />
-                Save Changes
-              </>
-            )}
-          </button>
+          {isEditing && (
+            <button
+              onClick={handleSave}
+              disabled={loading || uploading || !formData.media_id}
+              className="flex items-center px-8 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <>
+                  <Loader2 size={20} className="mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save size={20} className="mr-2" />
+                  Save Changes
+                </>
+              )}
+            </button>
+          )}
         </div>
 
         {/* Info Box */}
@@ -373,6 +412,7 @@ export default function HeroVideoPage() {
             ⚠️ Important Notes
           </h4>
           <ul className="text-sm text-yellow-800 space-y-1">
+            <li>• Enable editing to make changes</li>
             <li>• First upload the video to Firebase, then save changes</li>
             <li>• Video will be visible on the homepage hero section</li>
             <li>• Recommended format: MP4 (H.264 codec)</li>

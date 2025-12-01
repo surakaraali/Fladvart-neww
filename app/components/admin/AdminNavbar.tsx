@@ -34,6 +34,7 @@ export default function AdminNavbar() {
         { href: '/admin/content/hero', label: 'Hero Video' },
         { href: '/admin/content/why-we-exist', label: 'Why We Exist' },
         { href: '/admin/content/services', label: 'Services' },
+        { href: '/admin/content/cta-section', label: 'CTA Section' },
         { href: '/admin/content/contact-info', label: 'Contact Info' }
       ]
     },

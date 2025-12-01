@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Upload, Save, Loader2, Image as ImageIcon, X } from 'lucide-react';
+import { Upload, Save, Loader2, Image as ImageIcon, X, Lock, Unlock } from 'lucide-react';
 import AdminLayout from '@/app/admin/AdminLayout';
 
 interface ImageData {
@@ -58,6 +58,7 @@ export default function WhyWeExistPage() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     fetchContent();
@@ -235,12 +236,18 @@ export default function WhyWeExistPage() {
 
       alert('İçerik başarıyla kaydedildi!');
       fetchContent();
+      setIsEditing(false);
     } catch (error) {
       console.error('Save error:', error);
       alert('Kaydetme sırasında bir hata oluştu');
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    fetchContent(); // Revert changes
   };
 
   if (loading) {
@@ -262,7 +269,7 @@ export default function WhyWeExistPage() {
     title: string;
     imageData: ImageData;
   }) => (
-    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+    <div className={`bg-white rounded-lg border border-gray-200 overflow-hidden transition-opacity ${!isEditing ? 'opacity-75 pointer-events-none' : ''}`}>
       <div className="p-4 border-b border-gray-200 bg-gray-50">
         <h3 className="font-medium text-gray-900">{title}</h3>
       </div>
@@ -275,14 +282,16 @@ export default function WhyWeExistPage() {
               alt={title}
               className="w-full h-48 object-cover rounded-lg"
             />
-            <button
-              onClick={() => handleRemoveImage(imageKey)}
-              className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full hover:bg-red-600"
-            >
-              <X className="w-4 h-4" />
-            </button>
+            {isEditing && (
+              <button
+                onClick={() => handleRemoveImage(imageKey)}
+                className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full hover:bg-red-600"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
             
-            {imageData.file && !imageData.mediaId && (
+            {imageData.file && !imageData.mediaId && isEditing && (
               <button
                 onClick={() => handleUploadImage(imageKey)}
                 disabled={uploading === imageKey}
@@ -310,7 +319,7 @@ export default function WhyWeExistPage() {
             )}
           </div>
         ) : (
-          <label className="flex flex-col items-center justify-center h-48 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 transition-colors">
+          <label className={`flex flex-col items-center justify-center h-48 border-2 border-dashed border-gray-300 rounded-lg ${isEditing ? 'cursor-pointer hover:border-blue-500' : 'cursor-not-allowed'} transition-colors`}>
             <ImageIcon className="w-12 h-12 text-gray-400 mb-2" />
             <span className="text-sm text-gray-600">Görsel Seç</span>
             <input
@@ -321,6 +330,7 @@ export default function WhyWeExistPage() {
                 if (file) handleImageSelect(imageKey, file);
               }}
               className="hidden"
+              disabled={!isEditing}
             />
           </label>
         )}
@@ -331,8 +341,35 @@ export default function WhyWeExistPage() {
   return (
     <AdminLayout title="Why We Exist Content">
       <div className="max-w-7xl mx-auto space-y-6">
+        
+        {/* Header with Edit Toggle */}
+        <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-gray-600">
+            Manage the content and images for the &quot;Why We Exist&quot; section.
+          </p>
+          <div>
+            {!isEditing ? (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <Unlock size={18} className="mr-2" />
+                Enable Editing
+              </button>
+            ) : (
+              <button
+                onClick={handleCancel}
+                className="flex items-center px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+              >
+                <Lock size={18} className="mr-2" />
+                Cancel Editing
+              </button>
+            )}
+          </div>
+        </div>
+
         {/* Main Title */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className={`bg-white rounded-lg shadow-sm border border-gray-200 p-6 transition-opacity ${!isEditing ? 'opacity-75' : ''}`}>
           <h2 className="text-lg font-semibold mb-4 text-gray-900">Ana Başlık</h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -343,7 +380,8 @@ export default function WhyWeExistPage() {
                 type="text"
                 value={content.main_title_en}
                 onChange={(e) => setContent({ ...content, main_title_en: e.target.value })}
-                className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                disabled={!isEditing}
+                className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                 placeholder="WHY WE EXIST"
               />
             </div>
@@ -355,7 +393,8 @@ export default function WhyWeExistPage() {
                 type="text"
                 value={content.main_title_tr}
                 onChange={(e) => setContent({ ...content, main_title_tr: e.target.value })}
-                className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                disabled={!isEditing}
+                className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                 placeholder="NEDEN VARIZ"
               />
             </div>
@@ -363,7 +402,7 @@ export default function WhyWeExistPage() {
         </div>
 
         {/* Left Title */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className={`bg-white rounded-lg shadow-sm border border-gray-200 p-6 transition-opacity ${!isEditing ? 'opacity-75' : ''}`}>
           <h2 className="text-lg font-semibold mb-4 text-gray-900">Sol Taraf Başlık</h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -373,8 +412,9 @@ export default function WhyWeExistPage() {
               <textarea
                 value={content.left_title_en}
                 onChange={(e) => setContent({ ...content, left_title_en: e.target.value })}
+                disabled={!isEditing}
                 rows={4}
-                className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                 placeholder="WE'RE NOT HERE TO DECORATE PERCEPTION..."
               />
             </div>
@@ -385,8 +425,9 @@ export default function WhyWeExistPage() {
               <textarea
                 value={content.left_title_tr}
                 onChange={(e) => setContent({ ...content, left_title_tr: e.target.value })}
+                disabled={!isEditing}
                 rows={4}
-                className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                 placeholder="ALGILARI SÜSLEMEYİZ..."
               />
             </div>
@@ -394,7 +435,7 @@ export default function WhyWeExistPage() {
         </div>
 
         {/* Right Paragraphs */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className={`bg-white rounded-lg shadow-sm border border-gray-200 p-6 transition-opacity ${!isEditing ? 'opacity-75' : ''}`}>
           <h2 className="text-lg font-semibold mb-4 text-gray-900">Sağ Taraf Paragraflar</h2>
           
           <div className="space-y-6">
@@ -407,8 +448,9 @@ export default function WhyWeExistPage() {
                   <textarea
                     value={content.right_paragraph_1_en}
                     onChange={(e) => setContent({ ...content, right_paragraph_1_en: e.target.value })}
+                    disabled={!isEditing}
                     rows={5}
-                    className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                    className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm disabled:bg-gray-50 disabled:text-gray-500"
                     placeholder="Brands don't need another campaign..."
                   />
                 </div>
@@ -417,8 +459,9 @@ export default function WhyWeExistPage() {
                   <textarea
                     value={content.right_paragraph_1_tr}
                     onChange={(e) => setContent({ ...content, right_paragraph_1_tr: e.target.value })}
+                    disabled={!isEditing}
                     rows={5}
-                    className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                    className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm disabled:bg-gray-50 disabled:text-gray-500"
                     placeholder="Markalar başka bir kampanyaya ihtiyaç duymuyor..."
                   />
                 </div>
@@ -434,8 +477,9 @@ export default function WhyWeExistPage() {
                   <textarea
                     value={content.right_paragraph_2_en}
                     onChange={(e) => setContent({ ...content, right_paragraph_2_en: e.target.value })}
+                    disabled={!isEditing}
                     rows={5}
-                    className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                    className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm disabled:bg-gray-50 disabled:text-gray-500"
                     placeholder="Our work exists between logic and emotion..."
                   />
                 </div>
@@ -444,8 +488,9 @@ export default function WhyWeExistPage() {
                   <textarea
                     value={content.right_paragraph_2_tr}
                     onChange={(e) => setContent({ ...content, right_paragraph_2_tr: e.target.value })}
+                    disabled={!isEditing}
                     rows={5}
-                    className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                    className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm disabled:bg-gray-50 disabled:text-gray-500"
                     placeholder="İşimiz mantık ve duygu arasında var..."
                   />
                 </div>
@@ -477,7 +522,7 @@ export default function WhyWeExistPage() {
         </div>
 
         {/* Bottom Text */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className={`bg-white rounded-lg shadow-sm border border-gray-200 p-6 transition-opacity ${!isEditing ? 'opacity-75' : ''}`}>
           <h2 className="text-lg font-semibold mb-4 text-gray-900">Alt Metin</h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -487,8 +532,9 @@ export default function WhyWeExistPage() {
               <textarea
                 value={content.bottom_text_en}
                 onChange={(e) => setContent({ ...content, bottom_text_en: e.target.value })}
+                disabled={!isEditing}
                 rows={3}
-                className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                 placeholder="Fladvart is a creative studio..."
               />
             </div>
@@ -499,8 +545,9 @@ export default function WhyWeExistPage() {
               <textarea
                 value={content.bottom_text_tr}
                 onChange={(e) => setContent({ ...content, bottom_text_tr: e.target.value })}
+                disabled={!isEditing}
                 rows={3}
-                className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                 placeholder="Fladvart hissedilmek isteyen markalar için..."
               />
             </div>
@@ -508,25 +555,27 @@ export default function WhyWeExistPage() {
         </div>
 
         {/* Save Button */}
-        <div className="flex justify-end">
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {saving ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" />
-                Kaydediliyor...
-              </>
-            ) : (
-              <>
-                <Save className="w-5 h-5" />
-                Değişiklikleri Kaydet
-              </>
-            )}
-          </button>
-        </div>
+        {isEditing && (
+          <div className="flex justify-end">
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {saving ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Kaydediliyor...
+                </>
+              ) : (
+                <>
+                  <Save className="w-5 h-5" />
+                  Değişiklikleri Kaydet
+                </>
+              )}
+            </button>
+          </div>
+        )}
       </div>
     </AdminLayout>
   );

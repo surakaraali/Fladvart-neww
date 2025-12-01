@@ -154,6 +154,25 @@ async function setupComprehensiveDatabase() {
       )
     `);
 
+    // 10) CTA Section (Call to Action - "Your Vision Deserves" bölümü + kayan text)
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS cta_section (
+        id SERIAL PRIMARY KEY,
+        main_title_en TEXT NOT NULL,
+        main_title_tr TEXT NOT NULL,
+        description_en TEXT NOT NULL,
+        description_tr TEXT NOT NULL,
+        button_text_en VARCHAR(100) NOT NULL,
+        button_text_tr VARCHAR(100) NOT NULL,
+        button_link VARCHAR(255) DEFAULT '#contact',
+        background_image_media_id INT REFERENCES media(id) ON DELETE SET NULL,
+        marquee_items JSONB NOT NULL DEFAULT '[]',
+        is_active BOOLEAN DEFAULT true,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     console.log('All tables created successfully!');
 
     // Sample data ekleme
@@ -348,6 +367,28 @@ async function insertSampleData() {
     'NİŞBETİYE, NİŞBETİYE CD NO:24, 34340 BEŞİKTAŞ/İSTANBUL, TURKEY',
     'https://linkedin.com/company/fladvart',
     'https://instagram.com/fladvart'
+  ]);
+
+  // CTA Section
+  await pool.query(`
+    INSERT INTO cta_section (
+      main_title_en, main_title_tr,
+      description_en, description_tr,
+      button_text_en, button_text_tr,
+      button_link,
+      marquee_items
+    )
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    ON CONFLICT DO NOTHING
+  `, [
+    'YOUR VISION DESERVES A TAILORED SOLUTION',
+    'VİZYONUNUZ ÖZEL BİR ÇÖZÜM HAK EDİYOR',
+    'SHARE YOUR GOALS AND WE\'LL CRAFT A CUSTOM OFFER FOR YOUR BRAND.',
+    'HEDEFLERİNİZİ PAYLAŞIN, MARKANIZ İÇİN ÖZEL BİR TEKLİF HAZIRLAYALIM.',
+    'LET\'S COLLABORATE',
+    'İŞBİRLİĞİ YAPALIM',
+    '#contact',
+    '["CREATIVE CONSULTANCY", "DIGITAL & MOTION EXPERIENCES", "CAMPAIGN & BRAND DESIGN", "CREATIVE CONSULTANCY", "DIGITAL & MOTION EXPERIENCES"]'
   ]);
 
   console.log('Sample data inserted successfully!');
