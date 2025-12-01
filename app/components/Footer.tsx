@@ -5,15 +5,25 @@ export default function Footer() {
   return (
     <div className="min-h-screen bg-white">
       {/* Footer Section */}
-      <footer className="bg-[#121727] text-white px-12 py-16">
-        <div className="bg-[#121727] max-w-7xl mx-auto">
+      <footer className="relative bg-[#070c18] text-white px-12 pt-16">
+        {/* SOL YARIM – daha açık lacivert overlay */}
+        <div
+          className="absolute inset-y-0 left-0 w-1/2 bg-[#121727]"
+          aria-hidden="true"
+        />
+
+        <div className="max-w-7xl mx-auto relative z-10">
           <div className="grid grid-cols-12 gap-16">
             {/* Left Column - Contact Form */}
             <div className="col-span-5">
               {/* Logo */}
-              <div className="mb-16">
+              <div className="mb-10">
                 <h2 className="text-4xl font-bold">
-                  <img src="/logofladvart.png" alt="logo" className="w-52 h-auto" />
+                  <img
+                    src="/logofladvart.png"
+                    alt="logo"
+                    className="w-52 h-auto"
+                  />
                 </h2>
               </div>
 
@@ -42,7 +52,9 @@ export default function Footer() {
 
                 {/* Company Input */}
                 <div>
-                  <label className="block text-sm mb-2">Company (If Available)</label>
+                  <label className="block text-sm mb-2">
+                    Company (If Available)
+                  </label>
                   <input
                     type="text"
                     placeholder="Türkoğulları"
@@ -83,7 +95,7 @@ export default function Footer() {
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  className="bg-white text-gray-900 px-8 py-3 rounded-sm font-semibold hover:bg-gray-200 transition mt-8"
+                  className="bg-white text-gray-900 px-8 py-3 rounded-sm font-semibold hover:bg-gray-200 transition mt-4 mb-3"
                 >
                   Request an Offer
                 </button>
@@ -91,14 +103,18 @@ export default function Footer() {
             </div>
 
             {/* Right Column - Info & Links */}
-            <div className="col-span-7 pl-16 mt-56">
-              <div className="grid grid-cols-2 gap-16 mb-16">
+            <div className="col-span-7 pl-20 pt-60 pb-10 ml-10">
+              <div className="grid grid-cols-2 gap-10 mb-20">
                 {/* Address */}
                 <div>
-                  <h4 className="text-sm font-semibold mb-4">FLADVART CREATIVE HQ</h4>
+                  <h4 className="text-sm font-semibold mb-2">
+                    FLADVART CREATIVE HQ
+                  </h4>
                   <p className="text-gray-400 text-sm leading-relaxed">
-                    NİŞBETİYE, NİŞBETİYE CD NO:24,<br />
-                    34340 BEŞİKTAŞ/İSTANBUL,<br />
+                    NİŞBETİYE, NİŞBETİYE CD NO:24,
+                    <br />
+                    34340 BEŞİKTAŞ/İSTANBUL,
+                    <br />
                     TÜRKİYE
                   </p>
                 </div>
@@ -118,25 +134,48 @@ export default function Footer() {
               </div>
 
               {/* Navigation Links */}
-              <div className="flex gap-16 mb-16">
-                <a href="#contact" className="text-sm hover:text-gray-400 transition">CONTACT US</a>
-                <a href="#why" className="text-sm hover:text-gray-400 transition">WHY WE EXIST</a>
-                <a href="#services" className="text-sm hover:text-gray-400 transition">SERVICES</a>
+              <div className="flex gap-25 mb-16">
+                <a
+                  href="#contact"
+                  className="text-sm hover:text-gray-400 transition"
+                >
+                  CONTACT US
+                </a>
+                <a
+                  href="#why"
+                  className="text-sm hover:text-gray-400 transition"
+                >
+                  WHY WE EXIST
+                </a>
+                <a
+                  href="#services"
+                  className="text-sm hover:text-gray-400 transition"
+                >
+                  SERVICES
+                </a>
               </div>
 
               {/* Social Icons */}
               <div className="flex gap-4 mb-16">
-                <a href="#" className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-200 transition">
+                <a
+                  href="#"
+                  className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-200 transition"
+                >
                   <span className="text-gray-900 text-xl">in</span>
                 </a>
-                <a href="#" className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-200 transition">
+                <a
+                  href="#"
+                  className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-200 transition"
+                >
                   <span className="text-gray-900 text-xl">@</span>
                 </a>
               </div>
 
-              {/* Copyright */}
-              <div className="flex mt-64 justify-between items-center pt-8 border-gray-800">
-                <p className="text-gray-500 text-sm">Fladvart® All Rights Reserved.</p>
+              {/* Copyright – alt boşluk küçültüldü */}
+              <div className="flex mt-45 justify-between items-center pt-8 border-gray-800 ">
+                <p className="text-gray-500 text-sm">
+                  Fladvart® All Rights Reserved.
+                </p>
                 <p className="text-gray-500 text-sm">© 2025</p>
               </div>
             </div>
