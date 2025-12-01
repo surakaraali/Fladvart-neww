@@ -17,16 +17,29 @@ export default function HeroSection() {
           Your browser does not support the video tag.
         </video>
 
-        {/* Navigation - Center */}
-        <nav className="absolute top-8 left-1/2 transform -translate-x-1/2 z-10">
-          <div className="flex flex-col gap-2 text-white text-xs font-light text-center">
-            <a href="#why" className="hover:opacity-70 transition">{t('nav.why')}</a>
-            <a href="#services" className="hover:opacity-70 transition">{t('nav.services')}</a>
-            <a href="#contact" className="hover:opacity-70 transition">{t('nav.contact')}</a>
+        {/* Navigation */}
+        <nav className="absolute top-8 left-1/2 -translate-x-1/2 z-10">
+          <div className="flex flex-col gap-2 text-gray-400 text-xs font-light text-left">
+            <a
+              href="#why"
+              className="transition-colors duration-200 hover:text-white"
+            >
+             {t('nav.why')}
+            </a>
+            <a
+              href="#services"
+              className="transition-colors duration-200 hover:text-white"
+            >
+              {t('nav.services')}
+            </a>
+            <a
+              href="#contact"
+              className="transition-colors duration-200 hover:text-white"
+            >
+              {t('nav.contact')}
+            </a>
           </div>
         </nav>
-
-        {/* Language Toggle - Top Right */}
         <div className="absolute top-8 right-8 z-10 text-white text-xs font-light">
           <button
             className={`hover:opacity-70 transition ${locale === 'tr' ? 'font-semibold' : ''}`}
