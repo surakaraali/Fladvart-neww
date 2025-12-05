@@ -188,39 +188,93 @@ export default function ServicesSection() {
                       <div className="marquee-right pl-2">
                         <div className="flex">
                           <h3 className="text-6xl font-extrabold leading-none whitespace-nowrap pr-16">
-                            <span style={{ color: '#ffffff' }}>{firstLine}</span>&nbsp;
-                            <span style={{ color: '#878787' }}>{secondLine}</span>&nbsp;
-                            <span style={{ color: '#ffffff' }}>{firstLine}</span>&nbsp;
-                            <span style={{ color: '#878787' }}>{secondLine}</span>&nbsp;
+                            {words.map((word, wordIndex) => {
+                              const groupIndex = Math.floor(wordIndex / 2);
+                              const color = groupIndex % 2 === 0 ? '#a8a7a7' : '#ffffff';
+                              return (
+                                <span key={wordIndex} style={{ color }}>
+                                  {word}&nbsp;
+                                </span>
+                              );
+                            })}
+                            {words.map((word, wordIndex) => {
+                              const groupIndex = Math.floor(wordIndex / 2);
+                              const color = groupIndex % 2 === 0 ? '#a8a7a7' : '#ffffff';
+                              return (
+                                <span key={`repeat1-${wordIndex}`} style={{ color }}>
+                                  {word}&nbsp;
+                                </span>
+                              );
+                            })}
                           </h3>
                           <h3 className="text-6xl font-extrabold leading-none whitespace-nowrap">
-                            <span style={{ color: '#ffffff' }}>{firstLine}</span>&nbsp;
-                            <span style={{ color: '#878787' }}>{secondLine}</span>&nbsp;
-                            <span style={{ color: '#ffffff' }}>{firstLine}</span>&nbsp;
-                            <span style={{ color: '#878787' }}>{secondLine}</span>&nbsp;
+                            {words.map((word, wordIndex) => {
+                              const groupIndex = Math.floor(wordIndex / 2);
+                              const color = groupIndex % 2 === 0 ? '#a8a7a7' : '#ffffff';
+                              return (
+                                <span key={`second-${wordIndex}`} style={{ color }}>
+                                  {word}&nbsp;
+                                </span>
+                              );
+                            })}
+                            {words.map((word, wordIndex) => {
+                              const groupIndex = Math.floor(wordIndex / 2);
+                              const color = groupIndex % 2 === 0 ? '#a8a7a7' : '#ffffff';
+                              return (
+                                <span key={`repeat2-${wordIndex}`} style={{ color }}>
+                                  {word}&nbsp;
+                                </span>
+                              );
+                            })}
                           </h3>
                         </div>
                       </div>
 
                       {/* Second line - Scroll left */}
-                      {secondLine && (
-                        <div className="marquee-left pl-24">
-                          <div className="flex">
-                            <h3 className="text-6xl font-extrabold leading-none whitespace-nowrap pr-16">
-                              <span style={{ color: '#ffffff' }}>{firstLine}</span>&nbsp;
-                              <span style={{ color: '#878787' }}>{secondLine}</span>&nbsp;
-                              <span style={{ color: '#ffffff' }}>{firstLine}</span>&nbsp;
-                              <span style={{ color: '#878787' }}>{secondLine}</span>&nbsp;
-                            </h3>
-                            <h3 className="text-6xl font-extrabold leading-none whitespace-nowrap">
-                              <span style={{ color: '#ffffff' }}>{firstLine}</span>&nbsp;
-                              <span style={{ color: '#878787' }}>{secondLine}</span>&nbsp;
-                              <span style={{ color: '#ffffff' }}>{firstLine}</span>&nbsp;
-                              <span style={{ color: '#878787' }}>{secondLine}</span>&nbsp;
-                            </h3>
-                          </div>
+                      <div className="marquee-left pl-24">
+                        <div className="flex">
+                          <h3 className="text-6xl font-extrabold leading-none whitespace-nowrap pr-16">
+                            {words.map((word, wordIndex) => {
+                              const groupIndex = Math.floor(wordIndex / 2);
+                              const color = groupIndex % 2 === 0 ? '#a8a7a7' : '#ffffff';
+                              return (
+                                <span key={`left1-${wordIndex}`} style={{ color }}>
+                                  {word}&nbsp;
+                                </span>
+                              );
+                            })}
+                            {words.map((word, wordIndex) => {
+                              const groupIndex = Math.floor(wordIndex / 2);
+                              const color = groupIndex % 2 === 0 ? '#a8a7a7' : '#ffffff';
+                              return (
+                                <span key={`left-repeat1-${wordIndex}`} style={{ color }}>
+                                  {word}&nbsp;
+                                </span>
+                              );
+                            })}
+                          </h3>
+                          <h3 className="text-6xl font-extrabold leading-none whitespace-nowrap">
+                            {words.map((word, wordIndex) => {
+                              const groupIndex = Math.floor(wordIndex / 2);
+                              const color = groupIndex % 2 === 0 ? '#a8a7a7' : '#ffffff';
+                              return (
+                                <span key={`left2-${wordIndex}`} style={{ color }}>
+                                  {word}&nbsp;
+                                </span>
+                              );
+                            })}
+                            {words.map((word, wordIndex) => {
+                              const groupIndex = Math.floor(wordIndex / 2);
+                              const color = groupIndex % 2 === 0 ? '#a8a7a7' : '#ffffff';
+                              return (
+                                <span key={`left-repeat2-${wordIndex}`} style={{ color }}>
+                                  {word}&nbsp;
+                                </span>
+                              );
+                            })}
+                          </h3>
                         </div>
-                      )}
+                      </div>
                     </div>
                   )}
 
