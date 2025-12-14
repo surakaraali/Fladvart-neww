@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Upload, Save, Loader2, Image as ImageIcon, X, Lock, Unlock } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Upload, Save, Loader2, X, Lock, Unlock, Video as VideoIcon } from 'lucide-react';
 import AdminLayout from '@/app/admin/AdminLayout';
 
-interface ImageData {
+interface MediaData {
   file: File | null;
   preview: string | null;
   firebaseUrl: string | null;
@@ -23,10 +23,13 @@ interface WhyWeExistContent {
   right_paragraph_2_tr: string;
   bottom_text_en: string;
   bottom_text_tr: string;
-  image_1_media_id: number | null;
-  image_2_media_id: number | null;
-  image_3_media_id: number | null;
+
+  // why_videos table mapping
+  video_1_media_id: number | null;
+  video_2_media_id: number | null;
 }
+
+type VideoKey = 'video1' | 'video2';
 
 export default function WhyWeExistPage() {
   const [content, setContent] = useState<WhyWeExistContent>({
@@ -40,126 +43,131 @@ export default function WhyWeExistPage() {
     right_paragraph_2_tr: '',
     bottom_text_en: '',
     bottom_text_tr: '',
-    image_1_media_id: null,
-    image_2_media_id: null,
-    image_3_media_id: null,
+    video_1_media_id: null,
+    video_2_media_id: null,
   });
 
-  const [images, setImages] = useState<{
-    image1: ImageData;
-    image2: ImageData;
-    image3: ImageData;
-  }>({
-    image1: { file: null, preview: null, firebaseUrl: null, mediaId: null },
-    image2: { file: null, preview: null, firebaseUrl: null, mediaId: null },
-    image3: { file: null, preview: null, firebaseUrl: null, mediaId: null },
+  const [videos, setVideos] = useState<Record<VideoKey, MediaData>>({
+    video1: { file: null, preview: null, firebaseUrl: null, mediaId: null },
+    video2: { file: null, preview: null, firebaseUrl: null, mediaId: null },
   });
 
   const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState<string | null>(null);
+  const [uploading, setUploading] = useState<VideoKey | null>(null);
   const [saving, setSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     fetchContent();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchContent = async () => {
+    setLoading(true);
     try {
       const response = await fetch('/api/admin/why-we-exist');
-      if (response.ok) {
-        const result = await response.json();
-        
-        // API returns {success: true, data: {section, images}}
-        if (result.success && result.data) {
-          const section = result.data.section;
-          
-          // Set content with proper defaults
-          setContent({
-            id: section.id,
-            main_title_en: section.main_title_en || '',
-            main_title_tr: section.main_title_tr || '',
-            left_title_en: section.left_title_en || '',
-            left_title_tr: section.left_title_tr || '',
-            right_paragraph_1_en: section.right_paragraph_1_en || '',
-            right_paragraph_1_tr: section.right_paragraph_1_tr || '',
-            right_paragraph_2_en: section.right_paragraph_2_en || '',
-            right_paragraph_2_tr: section.right_paragraph_2_tr || '',
-            bottom_text_en: section.bottom_text_en || '',
-            bottom_text_tr: section.bottom_text_tr || '',
-            image_1_media_id: null,
-            image_2_media_id: null,
-            image_3_media_id: null,
+      if (!response.ok) throw new Error('Fetch failed');
+
+      const result = await response.json();
+
+      // Expected:
+      // { success: true, data: { section, videos: [{video_position, url, media_id}] } }
+      if (result?.success && result?.data?.section) {
+        const section = result.data.section;
+
+        // Reset videos state to avoid stale previews
+        setVideos({
+          video1: { file: null, preview: null, firebaseUrl: null, mediaId: null },
+          video2: { file: null, preview: null, firebaseUrl: null, mediaId: null },
+        });
+
+        let v1: number | null = null;
+        let v2: number | null = null;
+
+        const list = result?.data?.videos || [];
+        if (Array.isArray(list) && list.length > 0) {
+          list.forEach((v: any) => {
+            if (v.video_position === 1 && v.url) {
+              v1 = v.media_id ?? null;
+              setVideos(prev => ({
+                ...prev,
+                video1: {
+                  file: null,
+                  preview: v.url,
+                  firebaseUrl: v.url,
+                  mediaId: v.media_id ?? null,
+                },
+              }));
+            } else if (v.video_position === 2 && v.url) {
+              v2 = v.media_id ?? null;
+              setVideos(prev => ({
+                ...prev,
+                video2: {
+                  file: null,
+                  preview: v.url,
+                  firebaseUrl: v.url,
+                  mediaId: v.media_id ?? null,
+                },
+              }));
+            }
           });
-          
-          // Set existing images if available
-          if (result.data.images && result.data.images.length > 0) {
-            result.data.images.forEach((img: any) => {
-              if (img.image_position === 1 && img.url) {
-                setImages(prev => ({
-                  ...prev,
-                  image1: { 
-                    file: null, 
-                    preview: img.url, 
-                    firebaseUrl: img.url,
-                    mediaId: img.media_id 
-                  }
-                }));
-              } else if (img.image_position === 2 && img.url) {
-                setImages(prev => ({
-                  ...prev,
-                  image2: { 
-                    file: null, 
-                    preview: img.url, 
-                    firebaseUrl: img.url,
-                    mediaId: img.media_id 
-                  }
-                }));
-              } else if (img.image_position === 3 && img.url) {
-                setImages(prev => ({
-                  ...prev,
-                  image3: { 
-                    file: null, 
-                    preview: img.url, 
-                    firebaseUrl: img.url,
-                    mediaId: img.media_id 
-                  }
-                }));
-              }
-            });
-          }
         }
+
+        // Set content (include current video media ids so Save doesn't wipe them)
+        setContent({
+          id: section.id,
+          main_title_en: section.main_title_en || '',
+          main_title_tr: section.main_title_tr || '',
+          left_title_en: section.left_title_en || '',
+          left_title_tr: section.left_title_tr || '',
+          right_paragraph_1_en: section.right_paragraph_1_en || '',
+          right_paragraph_1_tr: section.right_paragraph_1_tr || '',
+          right_paragraph_2_en: section.right_paragraph_2_en || '',
+          right_paragraph_2_tr: section.right_paragraph_2_tr || '',
+          bottom_text_en: section.bottom_text_en || '',
+          bottom_text_tr: section.bottom_text_tr || '',
+          video_1_media_id: v1,
+          video_2_media_id: v2,
+        });
       }
     } catch (error) {
       console.error('Error fetching content:', error);
+      alert('İçerik çekilirken hata oluştu.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleImageSelect = (imageKey: 'image1' | 'image2' | 'image3', file: File) => {
-    if (!file.type.startsWith('image/')) {
-      alert('Lütfen bir görsel dosyası seçin');
+  const handleVideoSelect = (videoKey: VideoKey, file: File) => {
+    if (!file.type.startsWith('video/')) {
+      alert('Lütfen bir video dosyası seçin');
       return;
     }
 
     const preview = URL.createObjectURL(file);
-    setImages(prev => ({
+
+    // Revoke previous blob preview if exists
+    const prevPreview = videos[videoKey]?.preview;
+    if (prevPreview && prevPreview.startsWith('blob:')) {
+      URL.revokeObjectURL(prevPreview);
+    }
+
+    setVideos(prev => ({
       ...prev,
-      [imageKey]: { file, preview, firebaseUrl: null, mediaId: null }
+      [videoKey]: { file, preview, firebaseUrl: null, mediaId: null },
     }));
   };
 
-  const handleUploadImage = async (imageKey: 'image1' | 'image2' | 'image3') => {
-    const imageData = images[imageKey];
-    if (!imageData.file) return;
+  const handleUploadVideo = async (videoKey: VideoKey) => {
+    const videoData = videos[videoKey];
+    if (!videoData.file) return;
 
-    setUploading(imageKey);
+    setUploading(videoKey);
 
     try {
       const formData = new FormData();
-      formData.append('file', imageData.file);
-      formData.append('context', `why_we_exist_${imageKey}`);
+      formData.append('file', videoData.file);
+      formData.append('context', `why_we_exist_${videoKey}`); // why_we_exist_video1 / video2
 
       const response = await fetch('/api/admin/upload', {
         method: 'POST',
@@ -167,22 +175,21 @@ export default function WhyWeExistPage() {
       });
 
       const data = await response.json();
-      console.log('Upload response:', data);
 
       if (!response.ok || !data.success) {
         throw new Error(data.error || 'Upload failed');
       }
-      
-      setImages(prev => ({
+
+      setVideos(prev => ({
         ...prev,
-        [imageKey]: {
-          ...prev[imageKey],
+        [videoKey]: {
+          ...prev[videoKey],
           firebaseUrl: data.firebaseUrl,
-          mediaId: data.mediaId
-        }
+          mediaId: data.mediaId,
+        },
       }));
 
-      alert('Görsel başarıyla yüklendi!');
+      alert('Video başarıyla yüklendi!');
     } catch (error) {
       console.error('Upload error:', error);
       alert('Yükleme sırasında bir hata oluştu');
@@ -191,28 +198,26 @@ export default function WhyWeExistPage() {
     }
   };
 
-  const handleRemoveImage = (imageKey: 'image1' | 'image2' | 'image3') => {
-    if (images[imageKey].preview) {
-      URL.revokeObjectURL(images[imageKey].preview!);
+  const handleRemoveVideo = (videoKey: VideoKey) => {
+    const prevPreview = videos[videoKey]?.preview;
+    if (prevPreview && prevPreview.startsWith('blob:')) {
+      URL.revokeObjectURL(prevPreview);
     }
-    setImages(prev => ({
+
+    setVideos(prev => ({
       ...prev,
-      [imageKey]: { file: null, preview: null, firebaseUrl: null, mediaId: null }
+      [videoKey]: { file: null, preview: null, firebaseUrl: null, mediaId: null },
     }));
   };
 
   const handleSave = async () => {
-    // Validate that all images are uploaded
-    if (images.image1.file && !images.image1.mediaId) {
-      alert('Lütfen önce 1. görseli Firebase\'e yükleyin');
+    // Validate uploads (if a new file selected, require upload first)
+    if (videos.video1.file && !videos.video1.mediaId) {
+      alert("Lütfen önce 1. videoyu Firebase'e yükleyin");
       return;
     }
-    if (images.image2.file && !images.image2.mediaId) {
-      alert('Lütfen önce 2. görseli Firebase\'e yükleyin');
-      return;
-    }
-    if (images.image3.file && !images.image3.mediaId) {
-      alert('Lütfen önce 3. görseli Firebase\'e yükleyin');
+    if (videos.video2.file && !videos.video2.mediaId) {
+      alert("Lütfen önce 2. videoyu Firebase'e yükleyin");
       return;
     }
 
@@ -221,9 +226,8 @@ export default function WhyWeExistPage() {
     try {
       const payload = {
         ...content,
-        image_1_media_id: images.image1.mediaId || content.image_1_media_id,
-        image_2_media_id: images.image2.mediaId || content.image_2_media_id,
-        image_3_media_id: images.image3.mediaId || content.image_3_media_id,
+        video_1_media_id: videos.video1.mediaId ?? content.video_1_media_id,
+        video_2_media_id: videos.video2.mediaId ?? content.video_2_media_id,
       };
 
       const response = await fetch('/api/admin/why-we-exist', {
@@ -232,10 +236,14 @@ export default function WhyWeExistPage() {
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok) throw new Error('Save failed');
+      const resJson = await response.json().catch(() => null);
+
+      if (!response.ok || !resJson?.success) {
+        throw new Error(resJson?.error || 'Save failed');
+      }
 
       alert('İçerik başarıyla kaydedildi!');
-      fetchContent();
+      await fetchContent();
       setIsEditing(false);
     } catch (error) {
       console.error('Save error:', error);
@@ -247,7 +255,7 @@ export default function WhyWeExistPage() {
 
   const handleCancel = () => {
     setIsEditing(false);
-    fetchContent(); // Revert changes
+    fetchContent();
   };
 
   if (loading) {
@@ -260,44 +268,50 @@ export default function WhyWeExistPage() {
     );
   }
 
-  const ImageUploadCard = ({ 
-    imageKey, 
-    title, 
-    imageData 
-  }: { 
-    imageKey: 'image1' | 'image2' | 'image3'; 
+  const VideoUploadCard = ({
+    videoKey,
+    title,
+    videoData,
+  }: {
+    videoKey: VideoKey;
     title: string;
-    imageData: ImageData;
+    videoData: MediaData;
   }) => (
-    <div className={`bg-white rounded-lg border border-gray-200 overflow-hidden transition-opacity ${!isEditing ? 'opacity-75 pointer-events-none' : ''}`}>
+    <div
+      className={`bg-white rounded-lg border border-gray-200 overflow-hidden transition-opacity ${
+        !isEditing ? 'opacity-75 pointer-events-none' : ''
+      }`}
+    >
       <div className="p-4 border-b border-gray-200 bg-gray-50">
         <h3 className="font-medium text-gray-900">{title}</h3>
       </div>
-      
+
       <div className="p-4">
-        {imageData.preview ? (
+        {videoData.preview ? (
           <div className="relative">
-            <img
-              src={imageData.preview}
-              alt={title}
-              className="w-full h-48 object-cover rounded-lg"
+            <video
+              src={videoData.preview}
+              controls
+              muted
+              playsInline
+              className="w-full h-56 object-cover rounded-lg bg-black"
             />
             {isEditing && (
               <button
-                onClick={() => handleRemoveImage(imageKey)}
+                onClick={() => handleRemoveVideo(videoKey)}
                 className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full hover:bg-red-600"
               >
                 <X className="w-4 h-4" />
               </button>
             )}
-            
-            {imageData.file && !imageData.mediaId && isEditing && (
+
+            {videoData.file && !videoData.mediaId && isEditing && (
               <button
-                onClick={() => handleUploadImage(imageKey)}
-                disabled={uploading === imageKey}
+                onClick={() => handleUploadVideo(videoKey)}
+                disabled={uploading === videoKey}
                 className="mt-3 w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
               >
-                {uploading === imageKey ? (
+                {uploading === videoKey ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
                     Yükleniyor...
@@ -305,13 +319,13 @@ export default function WhyWeExistPage() {
                 ) : (
                   <>
                     <Upload className="w-4 h-4" />
-                    Firebase'e Yükle
+                    Firebase&apos;e Yükle
                   </>
                 )}
               </button>
             )}
-            
-            {imageData.mediaId && (
+
+            {videoData.mediaId && (
               <div className="mt-3 text-sm text-green-600 flex items-center gap-2">
                 <div className="w-2 h-2 bg-green-600 rounded-full" />
                 Yüklendi ✓
@@ -319,15 +333,20 @@ export default function WhyWeExistPage() {
             )}
           </div>
         ) : (
-          <label className={`flex flex-col items-center justify-center h-48 border-2 border-dashed border-gray-300 rounded-lg ${isEditing ? 'cursor-pointer hover:border-blue-500' : 'cursor-not-allowed'} transition-colors`}>
-            <ImageIcon className="w-12 h-12 text-gray-400 mb-2" />
-            <span className="text-sm text-gray-600">Görsel Seç</span>
+          <label
+            className={`flex flex-col items-center justify-center h-56 border-2 border-dashed border-gray-300 rounded-lg ${
+              isEditing ? 'cursor-pointer hover:border-blue-500' : 'cursor-not-allowed'
+            } transition-colors`}
+          >
+            <VideoIcon className="w-12 h-12 text-gray-400 mb-2" />
+            <span className="text-sm text-gray-600">Video Seç</span>
+            <span className="text-xs text-gray-500 mt-1">MP4 önerilir</span>
             <input
               type="file"
-              accept="image/*"
+              accept="video/*"
               onChange={(e) => {
                 const file = e.target.files?.[0];
-                if (file) handleImageSelect(imageKey, file);
+                if (file) handleVideoSelect(videoKey, file);
               }}
               className="hidden"
               disabled={!isEditing}
@@ -341,12 +360,9 @@ export default function WhyWeExistPage() {
   return (
     <AdminLayout title="Why We Exist Content">
       <div className="max-w-7xl mx-auto space-y-6">
-        
         {/* Header with Edit Toggle */}
         <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-          <p className="text-gray-600">
-            Manage the content and images for the &quot;Why We Exist&quot; section.
-          </p>
+          <p className="text-gray-600">Manage the content and videos for the &quot;Why We Exist&quot; section.</p>
           <div>
             {!isEditing ? (
               <button
@@ -373,9 +389,7 @@ export default function WhyWeExistPage() {
           <h2 className="text-lg font-semibold mb-4 text-gray-900">Ana Başlık</h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                İngilizce
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">İngilizce</label>
               <input
                 type="text"
                 value={content.main_title_en}
@@ -386,9 +400,7 @@ export default function WhyWeExistPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Türkçe
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Türkçe</label>
               <input
                 type="text"
                 value={content.main_title_tr}
@@ -406,29 +418,23 @@ export default function WhyWeExistPage() {
           <h2 className="text-lg font-semibold mb-4 text-gray-900">Sol Taraf Başlık</h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                İngilizce
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">İngilizce</label>
               <textarea
                 value={content.left_title_en}
                 onChange={(e) => setContent({ ...content, left_title_en: e.target.value })}
                 disabled={!isEditing}
                 rows={4}
                 className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
-                placeholder="WE'RE NOT HERE TO DECORATE PERCEPTION..."
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Türkçe
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Türkçe</label>
               <textarea
                 value={content.left_title_tr}
                 onChange={(e) => setContent({ ...content, left_title_tr: e.target.value })}
                 disabled={!isEditing}
                 rows={4}
                 className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
-                placeholder="ALGILARI SÜSLEMEYİZ..."
               />
             </div>
           </div>
@@ -437,9 +443,8 @@ export default function WhyWeExistPage() {
         {/* Right Paragraphs */}
         <div className={`bg-white rounded-lg shadow-sm border border-gray-200 p-6 transition-opacity ${!isEditing ? 'opacity-75' : ''}`}>
           <h2 className="text-lg font-semibold mb-4 text-gray-900">Sağ Taraf Paragraflar</h2>
-          
+
           <div className="space-y-6">
-            {/* Paragraph 1 */}
             <div>
               <h3 className="text-sm font-medium text-gray-700 mb-3">Paragraf 1</h3>
               <div className="grid grid-cols-2 gap-4">
@@ -451,7 +456,6 @@ export default function WhyWeExistPage() {
                     disabled={!isEditing}
                     rows={5}
                     className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm disabled:bg-gray-50 disabled:text-gray-500"
-                    placeholder="Brands don't need another campaign..."
                   />
                 </div>
                 <div>
@@ -462,13 +466,11 @@ export default function WhyWeExistPage() {
                     disabled={!isEditing}
                     rows={5}
                     className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm disabled:bg-gray-50 disabled:text-gray-500"
-                    placeholder="Markalar başka bir kampanyaya ihtiyaç duymuyor..."
                   />
                 </div>
               </div>
             </div>
 
-            {/* Paragraph 2 */}
             <div>
               <h3 className="text-sm font-medium text-gray-700 mb-3">Paragraf 2</h3>
               <div className="grid grid-cols-2 gap-4">
@@ -480,7 +482,6 @@ export default function WhyWeExistPage() {
                     disabled={!isEditing}
                     rows={5}
                     className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm disabled:bg-gray-50 disabled:text-gray-500"
-                    placeholder="Our work exists between logic and emotion..."
                   />
                 </div>
                 <div>
@@ -491,7 +492,6 @@ export default function WhyWeExistPage() {
                     disabled={!isEditing}
                     rows={5}
                     className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm disabled:bg-gray-50 disabled:text-gray-500"
-                    placeholder="İşimiz mantık ve duygu arasında var..."
                   />
                 </div>
               </div>
@@ -499,25 +499,12 @@ export default function WhyWeExistPage() {
           </div>
         </div>
 
-        {/* Images */}
+        {/* Videos */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold mb-4 text-gray-900">Görseller</h2>
-          <div className="grid grid-cols-3 gap-4">
-            <ImageUploadCard 
-              imageKey="image1" 
-              title="Sol Görsel" 
-              imageData={images.image1}
-            />
-            <ImageUploadCard 
-              imageKey="image2" 
-              title="Orta Görsel" 
-              imageData={images.image2}
-            />
-            <ImageUploadCard 
-              imageKey="image3" 
-              title="Sağ Görsel" 
-              imageData={images.image3}
-            />
+          <h2 className="text-lg font-semibold mb-4 text-gray-900">Videolar</h2>
+          <div className="grid grid-cols-2 gap-4">
+            <VideoUploadCard videoKey="video1" title="Sol Video" videoData={videos.video1} />
+            <VideoUploadCard videoKey="video2" title="Sağ Video" videoData={videos.video2} />
           </div>
         </div>
 
@@ -526,29 +513,23 @@ export default function WhyWeExistPage() {
           <h2 className="text-lg font-semibold mb-4 text-gray-900">Alt Metin</h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                İngilizce
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">İngilizce</label>
               <textarea
                 value={content.bottom_text_en}
                 onChange={(e) => setContent({ ...content, bottom_text_en: e.target.value })}
                 disabled={!isEditing}
                 rows={3}
                 className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
-                placeholder="Fladvart is a creative studio..."
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Türkçe
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Türkçe</label>
               <textarea
                 value={content.bottom_text_tr}
                 onChange={(e) => setContent({ ...content, bottom_text_tr: e.target.value })}
                 disabled={!isEditing}
                 rows={3}
                 className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
-                placeholder="Fladvart hissedilmek isteyen markalar için..."
               />
             </div>
           </div>

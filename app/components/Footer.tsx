@@ -228,7 +228,7 @@ export default function Footer() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className={`bg-white text-gray-900 px-8 py-3 rounded-sm font-semibold transition mt-4 mb-3 ${
+                  className={`bg-white text-gray-900 px-8 py-3 rounded-sm font-semibold transition mt-2 mb-3 ${
                     isSubmitting 
                       ? 'opacity-50 cursor-not-allowed' 
                       : 'hover:bg-gray-200'
@@ -312,7 +312,7 @@ export default function Footer() {
 
 
               {/* Copyright */}
-              <div className="flex mt-64 justify-between items-center pt-8 border-gray-800">
+              <div className="flex mt-50 justify-between items-center border-gray-800">
                 <p className="text-gray-500 text-sm">{t('footer.rights')}</p>
                 <p className="text-gray-500 text-sm">© 2025</p>
               </div>

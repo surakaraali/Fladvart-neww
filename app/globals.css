@@ -1,53 +1,76 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
 @import "tailwindcss";
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.8); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .animate-fadeIn {
   animation: fadeIn 0.2s ease-out;
 }
 
-/* Marquee Animations - Seamless Loop */
-/* SAĞA KAYAN */
+/* -------------------------------------------------- */
+/* Marquee Animations - Seamless Loop (boşluksuz)     */
+/* -------------------------------------------------- */
+
+/* SAĞA KAYAN SATIR (içerik sağa doğru akıyor) */
 @keyframes marquee-right {
   0% {
-    transform: translateX(0%);
+    transform: translateX(-50%);
   }
   100% {
-    transform: translateX(50%);
+    transform: translateX(0);
   }
 }
 
-/* SOLA KAYAN */
+/* SOLA KAYAN SATIR (içerik sola doğru akıyor) */
 @keyframes marquee-left {
   0% {
-    transform: translateX(0%);
+    transform: translateX(0);
   }
   100% {
     transform: translateX(-50%);
   }
 }
 
-/* Ortak marquee stilleri */
+/* Dış container – sadece kesmek için */
 .marquee-right,
 .marquee-left {
-  display: flex;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Asıl kayan track */
+.marquee-track {
+  display: inline-flex;       /* yan yana iki kopya */
   white-space: nowrap;
-  animation-duration: 12s;
+}
+
+/* Animasyonlar track üzerinde çalışıyor */
+.marquee-right .marquee-track,
+.marquee-left .marquee-track {
   animation-timing-function: linear;
   animation-iteration-count: infinite;
 }
 
-.marquee-right {
+/* SADECE animation-name veriyoruz */
+.marquee-right .marquee-track {
   animation-name: marquee-right;
 }
 
-.marquee-left {
+.marquee-left .marquee-track {
   animation-name: marquee-left;
 }
+
+
+/* -------------------------------------------------- */
 
 :root {
   --background: #ffffff;

@@ -24,7 +24,7 @@ export default function HeroSection() {
     try {
       const response = await fetch('/api/admin/hero-video');
       const data = await response.json();
-      
+
       if (data.success && data.data) {
         setHeroVideo(data.data);
       }
@@ -62,37 +62,52 @@ export default function HeroSection() {
 
         {/* Navigation */}
         <nav className="absolute top-8 left-1/2 -translate-x-1/2 z-10">
-          <div className="flex flex-col gap-2 text-gray-100 text-xs font-light text-left">
+          <div className="flex flex-col gap-1 text-gray-100 text-xs font-light text-left">
             <a
               href="#why"
-              className="transition-colors duration-200 hover:text-gray-400"
+              className="
+              text-white/60 
+              transition-all 
+              duration-200 
+              hover:text-white 
+            "
             >
-             {t('nav.why')}
+              {t('nav.why')}
             </a>
             <a
               href="#services"
-              className="transition-colors duration-200 hover:text-gray-400"
-            >
+              className="
+              text-white/60 
+              transition-all 
+              duration-200 
+              hover:text-white 
+            "            >
               {t('nav.services')}
             </a>
             <a
               href="#contact"
-              className="transition-colors duration-200 hover:text-gray-400"
-            >
+              className="
+              text-white/60 
+              transition-all 
+              duration-200 
+              hover:text-white 
+            "            >
               {t('nav.contact')}
             </a>
           </div>
         </nav>
         <div className="absolute top-8 right-8 z-10 text-white text-xs font-light">
           <button
-            className={`hover:opacity-70 transition ${locale === 'tr' ? 'font-semibold' : ''}`}
+            className={`  hover:text-white 
+              ${locale === 'tr' ? 'font-semibold' : ''}`}
             onClick={() => setLocale('tr')}
           >
             TR
           </button>
           <span className="mx-1">|</span>
           <button
-            className={`hover:opacity-70 transition ${locale === 'en' ? 'font-semibold' : ''}`}
+            className={`  hover:text-white 
+               ${locale === 'en' ? 'font-semibold' : ''}`}
             onClick={() => setLocale('en')}
           >
             EN
